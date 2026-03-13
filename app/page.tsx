@@ -14,7 +14,6 @@ export default function LandingPage() {
         refresh
         color="var(--primary)"
       />
-
       <div className="relative z-10">
         <Hero />
         <Skills />
