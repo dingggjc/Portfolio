@@ -7,8 +7,6 @@ import React, {
   type ComponentPropsWithoutRef,
 } from "react"
 
-import { useTheme } from "next-themes"
-
 import { cn } from "@/lib/utils"
 
 interface MousePosition {
@@ -49,20 +47,21 @@ interface ParticlesProps extends ComponentPropsWithoutRef<"div"> {
   vy?: number
 }
 
-function colorToRgb(color: string): number[] {
-  if (typeof window === "undefined") return [255, 255, 255]
-  const temp = document.createElement("div")
-  temp.style.color = color
-  document.body.appendChild(temp)
+function hexToRgb(hex: string): number[] {
+  hex = hex.replace("#", "")
 
-  const resolvedColor = getComputedStyle(temp).color
-  document.body.removeChild(temp)
-  const match = resolvedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
-  if (match) {
-    return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((char) => char + char)
+      .join("")
   }
 
-  return [255, 255, 255]
+  const hexInt = parseInt(hex, 16)
+  const red = (hexInt >> 16) & 255
+  const green = (hexInt >> 8) & 255
+  const blue = hexInt & 255
+  return [red, green, blue]
 }
 
 type Circle = {
@@ -104,17 +103,13 @@ export const Particles: React.FC<ParticlesProps> = ({
   const onMouseMoveRef = useRef<() => void>(() => {})
   const animateRef = useRef<() => void>(() => {})
 
-  const { resolvedTheme } = useTheme()
-  const [rgb, setRgb] = useState<number[]>([255, 255, 255])
-
-  useEffect(() => {
-    setRgb(colorToRgb(color))
-  }, [color, resolvedTheme])
-
   useEffect(() => {
     if (canvasRef.current) {
       context.current = canvasRef.current.getContext("2d")
     }
+
+    circles.current = []
+
     initCanvasRef.current()
     animateRef.current()
 
@@ -138,8 +133,7 @@ export const Particles: React.FC<ParticlesProps> = ({
       }
       window.removeEventListener("resize", handleResize)
     }
-  }, [rgb])
-
+  }, [color])
   useEffect(() => {
     onMouseMoveRef.current()
   }, [mousePosition.x, mousePosition.y])
@@ -178,6 +172,7 @@ export const Particles: React.FC<ParticlesProps> = ({
       canvasRef.current.style.height = `${canvasSize.current.h}px`
       context.current.scale(dpr, dpr)
 
+      // Clear existing particles and create new ones with exact quantity
       circles.current = []
       for (let i = 0; i < quantity; i++) {
         const circle = circleParams()
@@ -210,6 +205,8 @@ export const Particles: React.FC<ParticlesProps> = ({
       magnetism,
     }
   }
+
+  const rgb = hexToRgb(color)
 
   const drawCircle = (circle: Circle, update = false) => {
     if (context.current) {
@@ -262,11 +259,12 @@ export const Particles: React.FC<ParticlesProps> = ({
   const animate = () => {
     clearContext()
     circles.current.forEach((circle: Circle, i: number) => {
+      // Handle the alpha value
       const edge = [
-        circle.x + circle.translateX - circle.size,
-        canvasSize.current.w - circle.x - circle.translateX - circle.size,
-        circle.y + circle.translateY - circle.size,
-        canvasSize.current.h - circle.y - circle.translateY - circle.size,
+        circle.x + circle.translateX - circle.size, // distance from left edge
+        canvasSize.current.w - circle.x - circle.translateX - circle.size, // distance from right edge
+        circle.y + circle.translateY - circle.size, // distance from top edge
+        canvasSize.current.h - circle.y - circle.translateY - circle.size, // distance from bottom edge
       ]
       const closestEdge = edge.reduce((a, b) => Math.min(a, b))
       const remapClosestEdge = parseFloat(
@@ -290,14 +288,17 @@ export const Particles: React.FC<ParticlesProps> = ({
         ease
 
       drawCircle(circle, true)
+
+      // circle gets out of the canvas
       if (
         circle.x < -circle.size ||
         circle.x > canvasSize.current.w + circle.size ||
         circle.y < -circle.size ||
         circle.y > canvasSize.current.h + circle.size
       ) {
+        // remove the circle from the array
         circles.current.splice(i, 1)
-
+        // create a new circle
         const newCircle = circleParams()
         drawCircle(newCircle)
       }

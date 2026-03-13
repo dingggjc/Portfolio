@@ -10,15 +10,15 @@ export default function Hero() {
         <div className="px-auto py-auto mb-4 flex justify-center">
           <Avatar className="size-20">
             <AvatarImage
-              alt="@haydenbleasel"
-              src="https://github.com/haydenbleasel.png"
+              alt="@myusername"
+              src="/assets/jpeg/formaledited.JPG"
             />
             <AvatarFallback className="text-xl">HB</AvatarFallback>
           </Avatar>
         </div>
 
         <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl">
-          Hi, I&apos;m Charles Acierto
+          Hi, I&apos;m Charles
         </h1>
 
         <h2 className="mb-8 text-2xl font-medium text-muted-foreground md:text-3xl">
@@ -26,13 +26,10 @@ export default function Hero() {
         </h2>
 
         <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          A passionate junior developer with a strong foundation in modern web
-          and mobile technologies. I specialize in building responsive,
-          user-friendly applications using React.js and React Native. With
-          hands-on experience in HTML, CSS, and JavaScript, I focus on creating
-          clean, efficient code and delivering seamless user experiences.
-          I&apos;m eager to continue learning and growing while contributing to
-          innovative projects.
+          I build polished web and mobile experiences using React, Next.js, and
+          React Native. From my time as a Frontend Intern to my role as a
+          Semi-Backend Developer , I’ve focused on writing clean, efficient code
+          that bridges the gap between beautiful design and robust logic.
         </p>
 
         <div className="mb-10 flex justify-center gap-4">
