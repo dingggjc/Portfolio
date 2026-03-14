@@ -12,24 +12,25 @@ const skillCategories = [
     title: "Frontend",
     description: "Building responsive, interactive user interfaces",
     skills: [
-      "React.js",
+      "React",
+      "Next.js",
       "React Native",
-      "HTML",
-      "CSS",
-      "JavaScript",
       "TypeScript",
       "Tailwind CSS",
+      "HTML",
+      "CSS",
     ],
   },
   {
     title: "Backend",
     description: "Server-side development and API design",
-    skills: ["Node.js", "Express.js", "REST APIs"],
+    skills: ["C#/.NET", "MySQL", "PHP (Laravel)", "Node.js"],
   },
+
   {
     title: "Tools & Other",
-    description: "Development workflow and collaboration tools",
-    skills: ["Git", "GitHub", "VS Code", "Figma"],
+    description: "Workflow, design, and technical maintenance",
+    skills: ["Git", "Figma", "TanStack Query", "Zod"],
   },
 ]
 

@@ -39,12 +39,12 @@ export default function MainNavbar() {
   const actions = [
     {
       text: "Download CV",
-      href: "/signup",
+      href: "/others/Resume.pdf",
       isButton: true,
       variant: "default" as const,
+      download: true,
     },
   ]
-
   return (
     <Navbar
       name="Porfolio"

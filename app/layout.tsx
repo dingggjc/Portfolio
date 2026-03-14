@@ -12,6 +12,11 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+export const metadata = {
+  title: "JC | Portfolio",
+  description: "Frontend portfolio of JC",
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{

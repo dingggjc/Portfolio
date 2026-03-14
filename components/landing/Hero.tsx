@@ -1,4 +1,4 @@
-import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons"
+import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { Mail } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { InteractiveHoverButton } from "../ui/interactive-hover-button"
@@ -13,7 +13,7 @@ export default function Hero() {
               alt="@myusername"
               src="/assets/jpeg/formaledited.JPG"
             />
-            <AvatarFallback className="text-xl">HB</AvatarFallback>
+            <AvatarFallback className="text-xl">JC</AvatarFallback>
           </Avatar>
         </div>
 
@@ -43,7 +43,7 @@ export default function Hero() {
 
         <div className="flex justify-center gap-5">
           <a
-            href="https://github.com"
+            href="https://github.com/dingggjc"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground transition-colors hover:text-primary"
@@ -51,15 +51,7 @@ export default function Hero() {
             <GitHubLogoIcon className="h-6 w-6" />
           </a>
           <a
-            href="https://linkedin.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground transition-colors hover:text-primary"
-          >
-            <LinkedInLogoIcon className="h-6 w-6" />
-          </a>
-          <a
-            href="mailto:alex.morgan@email.com"
+            href="mailto:charlesaciertojc@gmail.com"
             className="text-muted-foreground transition-colors hover:text-primary"
           >
             <Mail className="h-6 w-6" />
