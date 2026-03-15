@@ -16,9 +16,8 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen">
       <Particles
-        key={resolvedTheme}
         className="absolute inset-0 z-0"
-        quantity={100}
+        quantity={60}
         ease={80}
         color={color}
         refresh={false}

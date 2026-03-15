@@ -148,13 +148,19 @@ export default function Navbar({
                           const targetId = link.href.replace("#", "")
                           const target = document.getElementById(targetId)
                           if (target) {
+                            window.dispatchEvent(new Event("scroll-start"))
+                            const navbarHeight = 84
                             const targetPosition =
                               target.getBoundingClientRect().top +
-                              window.scrollY
+                              window.scrollY -
+                              navbarHeight
                             animate(window.scrollY, targetPosition, {
-                              duration: 1.2,
-                              ease: [0.16, 1, 0.3, 1],
+                              duration: 0.6,
+                              ease: [0.22, 1, 0.36, 1],
                               onUpdate: (latest: number) => window.scrollTo(0, latest),
+                              onComplete: () => {
+                                window.dispatchEvent(new Event("scroll-end"))
+                              },
                             })
                           }
                         }

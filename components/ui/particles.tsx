@@ -14,26 +14,6 @@ interface MousePosition {
   y: number
 }
 
-function MousePosition(): MousePosition {
-  const [mousePosition, setMousePosition] = useState<MousePosition>({
-    x: 0,
-    y: 0,
-  })
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      setMousePosition({ x: event.clientX, y: event.clientY })
-    }
-
-    window.addEventListener("mousemove", handleMouseMove)
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [])
-
-  return mousePosition
-}
 
 interface ParticlesProps extends ComponentPropsWithoutRef<"div"> {
   className?: string
@@ -93,7 +73,7 @@ export const Particles: React.FC<ParticlesProps> = ({
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const context = useRef<CanvasRenderingContext2D | null>(null)
   const circles = useRef<Circle[]>([])
-  const mousePosition = MousePosition()
+  const mousePosition = useRef<MousePosition>({ x: 0, y: 0 })
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 })
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1
@@ -102,14 +82,9 @@ export const Particles: React.FC<ParticlesProps> = ({
   const initCanvasRef = useRef<() => void>(() => {})
   const onMouseMoveRef = useRef<() => void>(() => {})
   const animateRef = useRef<() => void>(() => {})
+  const isScrolling = useRef(false)
 
   useEffect(() => {
-    if (canvasRef.current) {
-      context.current = canvasRef.current.getContext("2d")
-    }
-
-    circles.current = []
-
     initCanvasRef.current()
     animateRef.current()
 
@@ -133,14 +108,43 @@ export const Particles: React.FC<ParticlesProps> = ({
       }
       window.removeEventListener("resize", handleResize)
     }
-  }, [color])
+  }, [quantity])
   useEffect(() => {
-    onMouseMoveRef.current()
-  }, [mousePosition.x, mousePosition.y])
+    const handleMouseMove = (event: MouseEvent) => {
+      mousePosition.current = { x: event.clientX, y: event.clientY }
+      onMouseMove()
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+    }
+  }, [])
 
   useEffect(() => {
+    const handleScrollStart = () => {
+      isScrolling.current = true
+    }
+    const handleScrollEnd = () => {
+      isScrolling.current = false
+    }
+
+    window.addEventListener("scroll-start", handleScrollStart)
+    window.addEventListener("scroll-end", handleScrollEnd)
+
+    return () => {
+      window.removeEventListener("scroll-start", handleScrollStart)
+      window.removeEventListener("scroll-end", handleScrollEnd)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      context.current = canvasRef.current.getContext("2d")
+    }
     initCanvasRef.current()
-  }, [refresh])
+  }, [])
 
   const initCanvas = () => {
     resizeCanvas()
@@ -151,8 +155,8 @@ export const Particles: React.FC<ParticlesProps> = ({
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect()
       const { w, h } = canvasSize.current
-      const x = mousePosition.x - rect.left - w / 2
-      const y = mousePosition.y - rect.top - h / 2
+      const x = mousePosition.current.x - rect.left - w / 2
+      const y = mousePosition.current.y - rect.top - h / 2
       const inside = x < w / 2 && x > -w / 2 && y < h / 2 && y > -h / 2
       if (inside) {
         mouse.current.x = x
@@ -206,7 +210,11 @@ export const Particles: React.FC<ParticlesProps> = ({
     }
   }
 
-  const rgb = hexToRgb(color)
+  const rgb = useRef<number[]>(hexToRgb(color))
+
+  useEffect(() => {
+    rgb.current = hexToRgb(color)
+  }, [color])
 
   const drawCircle = (circle: Circle, update = false) => {
     if (context.current) {
@@ -214,7 +222,7 @@ export const Particles: React.FC<ParticlesProps> = ({
       context.current.translate(translateX, translateY)
       context.current.beginPath()
       context.current.arc(x, y, size, 0, 2 * Math.PI)
-      context.current.fillStyle = `rgba(${rgb.join(", ")}, ${alpha})`
+      context.current.fillStyle = `rgba(${rgb.current.join(", ")}, ${alpha})`
       context.current.fill()
       context.current.setTransform(dpr, 0, 0, dpr, 0, 0)
 
@@ -257,6 +265,10 @@ export const Particles: React.FC<ParticlesProps> = ({
   }
 
   const animate = () => {
+    if (isScrolling.current) {
+      rafID.current = window.requestAnimationFrame(animateRef.current)
+      return
+    }
     clearContext()
     circles.current.forEach((circle: Circle, i: number) => {
       // Handle the alpha value

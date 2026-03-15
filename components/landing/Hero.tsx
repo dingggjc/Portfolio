@@ -13,10 +13,10 @@ export default function Hero() {
       className="flex min-h-screen items-center justify-center px-4 py-20"
     >
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto max-w-5xl text-center"
       >
         <div className="px-auto py-auto mb-4 flex justify-center">
@@ -54,12 +54,19 @@ export default function Hero() {
             onClick={() => {
               const target = document.getElementById("projects")
               if (target) {
+                window.dispatchEvent(new Event("scroll-start"))
+                const navbarHeight = 84
                 const targetPosition =
-                  target.getBoundingClientRect().top + window.scrollY
+                  target.getBoundingClientRect().top +
+                  window.scrollY -
+                  navbarHeight
                 animate(window.scrollY, targetPosition, {
-                  duration: 1.2,
-                  ease: [0.16, 1, 0.3, 1],
+                  duration: 0.6,
+                  ease: [0.22, 1, 0.36, 1],
                   onUpdate: (latest: number) => window.scrollTo(0, latest),
+                  onComplete: () => {
+                    window.dispatchEvent(new Event("scroll-end"))
+                  },
                 })
               }
             }}
