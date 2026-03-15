@@ -1,4 +1,7 @@
+"use client"
+
 import { Badge } from "../ui/badge"
+
 import {
   Card,
   CardContent,
@@ -34,10 +37,21 @@ const skillCategories = [
   },
 ]
 
+import { motion } from "motion/react"
+
 export default function Skills() {
   return (
-    <section className="flex min-h-screen items-center justify-center px-4 py-20">
-      <div className="mx-auto max-w-5xl">
+    <section
+      id="skills"
+      className="flex min-h-screen items-center justify-center px-4 py-20"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto max-w-5xl"
+      >
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-semibold tracking-widest text-primary uppercase">
             Skills
@@ -73,7 +87,7 @@ export default function Skills() {
             </Card>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

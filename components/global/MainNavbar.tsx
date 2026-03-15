@@ -5,35 +5,21 @@ export default function MainNavbar() {
   const desktopNavigation = (
     <Navigation
       menuItems={[
-        {
-          title: "Home",
-          isLink: true,
-          href: "/",
-        },
-        {
-          title: "Skills",
-          isLink: true,
-          href: "/skills",
-        },
-        {
-          title: "Project",
-          isLink: true,
-          href: "/project",
-        },
-        {
-          title: "Contact",
-          isLink: true,
-          href: "/contact",
-        },
+        { title: "Home", isLink: true, href: "#hero" },
+        { title: "Skills", isLink: true, href: "#skills" },
+        { title: "Projects", isLink: true, href: "#projects" },
+        { title: "Experience", isLink: true, href: "#experience" },
+        { title: "Contact", isLink: true, href: "#contact" },
       ]}
     />
   )
 
   const mobileLinks = [
-    { text: "Home", href: "/" },
-    { text: "Skills", href: "/skills" },
-    { text: "Project", href: "/project" },
-    { text: "Contact", href: "/contact" },
+    { text: "Home", href: "#hero" },
+    { text: "Skills", href: "#skills" },
+    { text: "Projects", href: "#projects" },
+    { text: "Experience", href: "#experience" },
+    { text: "Contact", href: "#contact" },
   ]
 
   const actions = [

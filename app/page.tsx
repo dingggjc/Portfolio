@@ -18,9 +18,10 @@ export default function LandingPage() {
       <Particles
         key={resolvedTheme}
         className="absolute inset-0 z-0"
-        quantity={400}
+        quantity={100}
         ease={80}
         color={color}
+        refresh={false}
       />
       <div className="relative z-10">
         <Hero />

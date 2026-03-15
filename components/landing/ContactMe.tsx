@@ -1,4 +1,7 @@
+"use client"
+
 import { cn } from "@/lib/utils"
+
 import { Mail, Phone } from "lucide-react"
 
 interface ContactMeProps {
@@ -13,6 +16,8 @@ interface ContactMeProps {
   className?: string
 }
 
+import { motion } from "motion/react"
+
 const ContactMe = ({
   title = "Get in Touch",
   description = "I'm currently open to new opportunities. Feel free to reach out via email or phone.",
@@ -26,12 +31,19 @@ const ContactMe = ({
 }: ContactMeProps) => {
   return (
     <section
+      id="contact"
       className={cn(
         "flex min-h-screen items-center justify-center px-4 py-20",
         className
       )}
     >
-      <div className="mx-auto w-full max-w-6xl">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto w-full max-w-6xl"
+      >
         <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <div className="flex flex-col space-y-4 pt-10 md:pt-16 lg:pt-24 lg:pr-10">
             <p className="text-sm font-semibold tracking-widest text-primary uppercase">
@@ -73,7 +85,7 @@ const ContactMe = ({
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

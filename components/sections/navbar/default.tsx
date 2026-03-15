@@ -1,4 +1,7 @@
+"use client"
+
 import { type VariantProps } from "class-variance-authority"
+import { animate } from "motion/react"
 import { Menu } from "lucide-react"
 import { ReactNode } from "react"
 
@@ -139,6 +142,23 @@ export default function Navbar({
                       key={index}
                       href={link.href}
                       className="text-muted-foreground hover:text-foreground"
+                      onClick={(e) => {
+                        if (link.href.startsWith("#")) {
+                          e.preventDefault()
+                          const targetId = link.href.replace("#", "")
+                          const target = document.getElementById(targetId)
+                          if (target) {
+                            const targetPosition =
+                              target.getBoundingClientRect().top +
+                              window.scrollY
+                            animate(window.scrollY, targetPosition, {
+                              duration: 1.2,
+                              ease: [0.16, 1, 0.3, 1],
+                              onUpdate: (latest: number) => window.scrollTo(0, latest),
+                            })
+                          }
+                        }
+                      }}
                     >
                       {link.text}
                     </a>

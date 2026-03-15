@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import * as React from "react"
+import { animate } from "motion/react"
 import { ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
@@ -130,7 +131,27 @@ export default function Navigation({
                 className={navigationMenuTriggerStyle()}
                 asChild
               >
-                <Link href={item.href || ""}>{item.title}</Link>
+                <Link
+                  href={item.href || ""}
+                  onClick={(e) => {
+                    if (item.href?.startsWith("#")) {
+                      e.preventDefault()
+                      const targetId = item.href.replace("#", "")
+                      const target = document.getElementById(targetId)
+                      if (target) {
+                        const targetPosition =
+                          target.getBoundingClientRect().top + window.scrollY
+                        animate(window.scrollY, targetPosition, {
+                          duration: 1.2,
+                          ease: [0.16, 1, 0.3, 1], // Slow-out momentum ease
+                          onUpdate: (latest: number) => window.scrollTo(0, latest),
+                        })
+                      }
+                    }
+                  }}
+                >
+                  {item.title}
+                </Link>
               </NavigationMenuLink>
             ) : (
               <>

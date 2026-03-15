@@ -1,5 +1,9 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import { BriefcaseBusiness } from "lucide-react"
+import { motion } from "motion/react"
 
 interface ExperienceItem {
   period: string
@@ -17,14 +21,16 @@ interface Experience1Props {
   className?: string
 }
 
+
+
 const Experience = ({
   heading = "Experience",
   experience = [
     {
       period: "6 Months",
-      title: "Frontend / Semi-Backend Developer",
+      title: "Software Developer",
       description:
-        "Developed and maintained frontend features using React and Next.js. Assisted with backend logic and API integration using C# (.NET) and managed databases with MySQL.",
+        "Developed frontend features for enterprise-level applications using React and Next.js, while managing backend logic and MySQL database structures via C#/.NET.",
       company: "Repoint Solutions",
       logo: "/assets/jpeg/RepointLogo.jpg",
     },
@@ -38,9 +44,9 @@ const Experience = ({
     },
     {
       period: "4 Months",
-      title: "Internship - Frontend Developer",
+      title: "Frontend Developer (Internship)",
       description:
-        "Built UI components using React, React Native, and Tailwind CSS. Integrated APIs using TanStack Query and implemented form validation with Zod.",
+        "Built and optimized mobile UI components using React Native and Tailwind CSS. Reduced API complexity by implementing TanStack Query and Zod for data validation.",
       company: "Repoint Solutions",
       logo: "/assets/jpeg/RepointLogo.jpg",
     },
@@ -49,12 +55,19 @@ const Experience = ({
 }: Experience1Props) => {
   return (
     <section
+      id="experience"
       className={cn(
         "flex min-h-screen items-center justify-center px-4 py-20",
         className
       )}
     >
-      <div className="mx-auto w-full max-w-6xl space-y-10 lg:space-y-12">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto w-full max-w-6xl space-y-10 lg:space-y-12"
+      >
         <div className="flex flex-col items-center text-center">
           <p className="mb-3 text-sm font-semibold tracking-widest text-primary uppercase">
             Career
@@ -97,7 +110,7 @@ const Experience = ({
             ))}
           </ul>
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

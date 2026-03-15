@@ -1,12 +1,24 @@
+"use client"
+
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
+import { animate, motion } from "motion/react"
 import { Mail } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { InteractiveHoverButton } from "../ui/interactive-hover-button"
 
 export default function Hero() {
   return (
-    <section className="flex min-h-screen items-center justify-center px-4 py-20">
-      <div className="mx-auto max-w-5xl text-center">
+    <section
+      id="hero"
+      className="flex min-h-screen items-center justify-center px-4 py-20"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto max-w-5xl text-center"
+      >
         <div className="px-auto py-auto mb-4 flex justify-center">
           <Avatar className="size-20">
             <AvatarImage
@@ -26,17 +38,50 @@ export default function Hero() {
         </h2>
 
         <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          I build polished web and mobile experiences using React, Next.js, and
-          React Native. From my time as a Frontend Intern to my role as a
-          Semi-Backend Developer , I’ve focused on writing clean, efficient code
-          that bridges the gap between beautiful design and robust logic.
+          Versatile Developer with professional experience building
+          high-performance web and mobile applications. Specializing in the
+          React ecosystem (Next.js, React Native) and backend integration with
+          C#/.NET. I focus on creating scalable, user-centric solutions by
+          bridging the gap between elegant frontend design and robust backend
+          logic. Proven ability to adapt quickly to new technologies and deliver
+          production-ready code in fast-paced environments
         </p>
 
         <div className="mb-10 flex justify-center gap-4">
-          <InteractiveHoverButton rounded="sm" showIcons={false}>
+          <InteractiveHoverButton
+            rounded="sm"
+            showIcons={false}
+            onClick={() => {
+              const target = document.getElementById("projects")
+              if (target) {
+                const targetPosition =
+                  target.getBoundingClientRect().top + window.scrollY
+                animate(window.scrollY, targetPosition, {
+                  duration: 1.2,
+                  ease: [0.16, 1, 0.3, 1],
+                  onUpdate: (latest: number) => window.scrollTo(0, latest),
+                })
+              }
+            }}
+          >
             View my work
           </InteractiveHoverButton>
-          <InteractiveHoverButton rounded="sm" showIcons={false}>
+          <InteractiveHoverButton
+            rounded="sm"
+            showIcons={false}
+            onClick={() => {
+              const target = document.getElementById("contact")
+              if (target) {
+                const targetPosition =
+                  target.getBoundingClientRect().top + window.scrollY
+                animate(window.scrollY, targetPosition, {
+                  duration: 1.2,
+                  ease: [0.16, 1, 0.3, 1],
+                  onUpdate: (latest: number) => window.scrollTo(0, latest),
+                })
+              }
+            }}
+          >
             Contact Me
           </InteractiveHoverButton>
         </div>
@@ -57,7 +102,7 @@ export default function Hero() {
             <Mail className="h-6 w-6" />
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }
