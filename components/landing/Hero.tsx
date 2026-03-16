@@ -1,8 +1,9 @@
 "use client"
 
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
+import { Globe2Icon, Mail } from "lucide-react"
 import { animate, motion } from "motion/react"
-import { Mail } from "lucide-react"
+import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { InteractiveHoverButton } from "../ui/interactive-hover-button"
 
@@ -16,7 +17,6 @@ export default function Hero() {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto max-w-5xl text-center"
       >
         <div className="px-auto py-auto mb-4 flex justify-center">
@@ -34,7 +34,7 @@ export default function Hero() {
         </h1>
 
         <h2 className="mb-8 text-2xl font-medium text-muted-foreground md:text-3xl">
-          Junior Developer
+          Web Developer
         </h2>
 
         <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground">
@@ -108,6 +108,13 @@ export default function Hero() {
           >
             <Mail className="h-6 w-6" />
           </a>
+
+          <Link
+            href="/login"
+            className="text-muted-foreground transition-colors hover:text-primary"
+          >
+            <Globe2Icon className="h-6 w-6" />
+          </Link>
         </div>
       </motion.div>
     </section>

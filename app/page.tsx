@@ -4,24 +4,16 @@ import ContactMe from "@/components/landing/ContactMe"
 import Experience from "@/components/landing/Experience"
 import Hero from "@/components/landing/Hero"
 import Skills from "@/components/landing/Skills"
-import { Particles } from "@/components/ui/particles"
-import { useTheme } from "next-themes"
+
+import { Meteors } from "@/components/ui/meteors"
 import { Projects } from "../components/landing/Projects"
 
 export default function LandingPage() {
-  const { resolvedTheme } = useTheme()
-
-  const color = resolvedTheme === "dark" ? "#ffffff" : "#000000"
-
   return (
     <div className="relative min-h-screen">
-      <Particles
-        className="absolute inset-0 z-0"
-        quantity={60}
-        ease={80}
-        color={color}
-        refresh={false}
-      />
+      <div className="pointer-events-none fixed inset-0 z-[-1]">
+        <Meteors number={60} />
+      </div>
       <div className="relative z-10">
         <Hero />
         <Skills />

@@ -1,9 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import Image from "next/image"
-import { BriefcaseBusiness } from "lucide-react"
 import { motion } from "motion/react"
+import Image from "next/image"
 
 interface ExperienceItem {
   period: string
@@ -20,8 +19,6 @@ interface Experience1Props {
   experience?: ExperienceItem[]
   className?: string
 }
-
-
 
 const Experience = ({
   heading = "Experience",
@@ -65,7 +62,6 @@ const Experience = ({
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto w-full max-w-6xl space-y-10 lg:space-y-12"
       >
         <div className="flex flex-col items-center text-center">

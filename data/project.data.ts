@@ -51,7 +51,7 @@ export const projects = [
   {
     id: "3",
     name: "Neuropoint",
-    description: "Educational LMS for NCLEX Prep",
+    description: "Educational LMS for NueroPoint Prep",
     href: "/project/3",
     websiteLink: "https://www.neuropoint.io/",
     cta: "View Details",

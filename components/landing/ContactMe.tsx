@@ -41,7 +41,6 @@ const ContactMe = ({
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto w-full max-w-6xl"
       >
         <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
