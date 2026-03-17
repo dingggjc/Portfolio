@@ -1,5 +1,4 @@
 import { createServerClient } from "@supabase/ssr"
-import { createClient } from "@/services/supabase/server"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(request: NextRequest) {
@@ -30,9 +29,6 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Do not run getUser() if the route is a public asset or internal Next.js route
-  // The matcher already handles this, but it's good to be safe.
-  
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -49,7 +45,9 @@ export async function middleware(request: NextRequest) {
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
-    url.searchParams.set("redirect", pathname)
+    if (pathname !== "/login") {
+      url.searchParams.set("redirect", pathname)
+    }
     return NextResponse.redirect(url)
   }
 
@@ -58,7 +56,7 @@ export async function middleware(request: NextRequest) {
     (pathname.startsWith("/login") || pathname.startsWith("/signup"))
   ) {
     const url = request.nextUrl.clone()
-    url.pathname = "/dashboard"
+    url.pathname = "/clients/dashboard"
     return NextResponse.redirect(url)
   }
 

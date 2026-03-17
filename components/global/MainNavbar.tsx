@@ -1,4 +1,5 @@
 import Navbar from "@/components/sections/navbar/default"
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
 import Navigation from "@/components/ui/navigation"
 
 export default function MainNavbar() {
@@ -30,10 +31,16 @@ export default function MainNavbar() {
       variant: "default" as const,
       download: true,
     },
+    {
+      text: "Theme",
+      href: "#",
+      icon: <AnimatedThemeToggler className="h-9 w-9 rounded-md" />,
+      isButton: false,
+    },
   ]
   return (
     <Navbar
-      name="Porfolio"
+      name="JC | Portfolio"
       homeUrl="/"
       customNavigation={desktopNavigation}
       mobileLinks={mobileLinks}

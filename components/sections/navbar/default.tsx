@@ -103,6 +103,10 @@ export default function Navbar({
                     {action.iconRight}
                   </a>
                 </Button>
+              ) : action.text === "Theme" ? (
+                <div key={index} className="hidden md:block">
+                  {action.icon}
+                </div>
               ) : (
                 <a
                   key={index}
