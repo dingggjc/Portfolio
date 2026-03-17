@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import MainNavbar from "@/components/global/MainNavbar"
 import { LoginForm } from "@/components/login-form"
 import { Meteors } from "@/components/ui/meteors"
