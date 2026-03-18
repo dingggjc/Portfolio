@@ -134,45 +134,78 @@ export default function Navbar({
                 <SheetDescription className="sr-only">
                   Main navigation links
                 </SheetDescription>
-                <nav className="grid gap-6 text-lg font-medium">
-                  <a
-                    href={homeUrl}
-                    className="flex items-center gap-2 text-xl font-bold"
-                  >
-                    <span>{name}</span>
-                  </a>
-                  {mobileLinks.map((link, index) => (
+                <nav className="flex flex-1 flex-col gap-1 text-lg font-medium">
+                  <div className="flex items-center px-2 pb-4 pt-8">
                     <a
-                      key={index}
-                      href={link.href}
-                      className="text-muted-foreground hover:text-foreground"
-                      onClick={(e) => {
-                        if (link.href.startsWith("#")) {
-                          e.preventDefault()
-                          const targetId = link.href.replace("#", "")
-                          const target = document.getElementById(targetId)
-                          if (target) {
-                            window.dispatchEvent(new Event("scroll-start"))
-                            const navbarHeight = 84
-                            const targetPosition =
-                              target.getBoundingClientRect().top +
-                              window.scrollY -
-                              navbarHeight
-                            animate(window.scrollY, targetPosition, {
-                              duration: 0.6,
-                              ease: [0.22, 1, 0.36, 1],
-                              onUpdate: (latest: number) => window.scrollTo(0, latest),
-                              onComplete: () => {
-                                window.dispatchEvent(new Event("scroll-end"))
-                              },
-                            })
-                          }
-                        }
-                      }}
+                      href={homeUrl}
+                      className="flex items-center gap-2 text-xl font-bold"
                     >
-                      {link.text}
+                      <span>{name}</span>
                     </a>
-                  ))}
+                  </div>
+                  
+                  <div className="flex flex-col gap-1 py-4">
+                    {mobileLinks.map((link, index) => (
+                      <a
+                        key={index}
+                        href={link.href}
+                        className="flex items-center rounded-lg px-2 py-3 text-base text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                        onClick={(e) => {
+                          if (link.href.startsWith("#")) {
+                            e.preventDefault()
+                            const targetId = link.href.replace("#", "")
+                            const target = document.getElementById(targetId)
+                            if (target) {
+                              window.dispatchEvent(new Event("scroll-start"))
+                              const navbarHeight = 84
+                              const targetPosition =
+                                target.getBoundingClientRect().top +
+                                window.scrollY -
+                                navbarHeight
+                              animate(window.scrollY, targetPosition, {
+                                duration: 0.6,
+                                ease: [0.22, 1, 0.36, 1],
+                                onUpdate: (latest: number) => window.scrollTo(0, latest),
+                                onComplete: () => {
+                                  window.dispatchEvent(new Event("scroll-end"))
+                                },
+                              })
+                            }
+                          }
+                        }}
+                      >
+                        {link.text}
+                      </a>
+                    ))}
+                  </div>
+
+                  <div className="mt-auto space-y-4 border-t pt-4">
+                    {actions.find((a) => a.text === "Theme") && (
+                      <div className="flex items-center justify-between px-2">
+                        <span className="text-sm font-medium">Appearance</span>
+                        {actions.find((a) => a.text === "Theme")?.icon}
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      {actions
+                        .filter((a) => a.isButton)
+                        .map((action, index) => (
+                          <Button
+                            key={index}
+                            variant={action.variant || "default"}
+                            size="sm"
+                            asChild
+                            className="w-full justify-center"
+                          >
+                            <a href={action.href}>
+                              {action.icon}
+                              {action.text}
+                              {action.iconRight}
+                            </a>
+                          </Button>
+                        ))}
+                    </div>
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
