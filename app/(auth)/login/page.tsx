@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic"
 import MainNavbar from "@/components/global/MainNavbar"
 import { LoginForm } from "@/components/login-form"
 import { Meteors } from "@/components/ui/meteors"
+import { Suspense } from "react"
 
 export default function LoginPage() {
   return (
@@ -15,7 +16,9 @@ export default function LoginPage() {
           <Meteors number={80} />
         </div>
         <div className="w-full max-w-sm">
-          <LoginForm />
+          <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </>

@@ -23,6 +23,7 @@ import {
   EllipsisVerticalIcon,
   LogOutIcon,
 } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -109,10 +110,12 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRoundIcon />
-                Account
-              </DropdownMenuItem>
+              <Link href="/clients/profile">
+                <DropdownMenuItem>
+                  <CircleUserRoundIcon />
+                  Account
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <BellIcon />
                 Notifications

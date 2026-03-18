@@ -9,101 +9,94 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { ClockIcon, TargetIcon, HistoryIcon, PercentIcon, TrendingUpIcon } from "lucide-react"
 
 export function SectionCards() {
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Hours Rendered</CardDescription>
+          <CardTitle className="text-2xl font-black tabular-nums @[250px]/card:text-3xl">
+            245.5<span className="ml-1 text-sm font-medium text-muted-foreground">h</span>
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +12.5%
+            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-[10px]">
+              <ClockIcon size={12} className="mr-1" /> ACTIVE
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month{" "}
-            <TrendingUpIcon className="size-4" />
+          <div className="line-clamp-1 flex gap-2 font-bold text-[11px] text-primary">
+            +8.5h logged today <TrendingUpIcon className="size-3" />
           </div>
-          <div className="text-muted-foreground">
-            Visitors for the last 6 months
+          <div className="text-[10px] font-medium text-muted-foreground italic">
+            Total validated training hours
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">OJT Goal</CardDescription>
+          <CardTitle className="text-2xl font-black tabular-nums @[250px]/card:text-3xl text-primary">
+            600<span className="ml-1 text-sm font-medium text-muted-foreground">h</span>
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingDownIcon
-              />
-              -20%
+            <Badge variant="outline" className="text-[10px]">
+              <TargetIcon size={12} className="mr-1" /> TARGET
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period{" "}
-            <TrendingDownIcon className="size-4" />
+          <div className="line-clamp-1 flex gap-2 font-bold text-[11px]">
+            OJT Training Requirement
           </div>
-          <div className="text-muted-foreground">
-            Acquisition needs attention
+          <div className="text-[10px] font-medium text-muted-foreground italic">
+            Required curriculum hours
           </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Remaining Balance</CardDescription>
+          <CardTitle className="text-2xl font-black tabular-nums @[250px]/card:text-3xl">
+            354.5<span className="ml-1 text-sm font-medium text-muted-foreground">h</span>
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +12.5%
-            </Badge>
+            <HistoryIcon size={14} className="text-muted-foreground/50" />
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention{" "}
-            <TrendingUpIcon className="size-4" />
+          <div className="line-clamp-1 flex gap-2 font-bold text-[11px] text-primary">
+            On track for completion
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
+          <div className="text-[10px] font-medium text-muted-foreground italic">
+            Hours left to finish OJT
+          </div>
         </CardFooter>
       </Card>
+
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+          <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">Completion Progress</CardDescription>
+          <CardTitle className="text-2xl font-black tabular-nums @[250px]/card:text-3xl">
+            40.9<span className="ml-1 text-sm font-medium text-muted-foreground">%</span>
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +4.5%
+            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-[10px]">
+              <PercentIcon size={12} className="mr-1" /> PROGRESS
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase{" "}
-            <TrendingUpIcon className="size-4" />
+          <div className="line-clamp-1 flex gap-2 font-bold text-[11px] text-primary">
+            Surpassing daily average
           </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
+          <div className="text-[10px] font-medium text-muted-foreground italic">
+            Overall training percentage
+          </div>
         </CardFooter>
       </Card>
     </div>

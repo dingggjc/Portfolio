@@ -56,8 +56,10 @@ export async function proxy(request: NextRequest) {
     user &&
     (pathname.startsWith("/login") || pathname.startsWith("/signup"))
   ) {
+    const redirect = request.nextUrl.searchParams.get("redirect")
     const url = request.nextUrl.clone()
-    url.pathname = "/clients/dashboard"
+    url.pathname = redirect || "/clients/dashboard"
+    url.searchParams.delete("redirect")
     return NextResponse.redirect(url)
   }
 

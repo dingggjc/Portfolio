@@ -12,7 +12,7 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/services/supabase/client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 
 export function LoginForm({
@@ -23,7 +23,10 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null)
   const [isLogin, setIsLogin] = useState(true)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  const redirectTo = searchParams.get("redirect") || "/clients/dashboard"
 
   async function handleEmailLogin(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -43,7 +46,7 @@ export function LoginForm({
       if (error) {
         setError(error.message)
       } else {
-        router.push("/clients/dashboard")
+        router.push(redirectTo)
         router.refresh()
       }
     } catch (err) {
