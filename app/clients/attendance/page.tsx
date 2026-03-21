@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { AttendanceHero } from "@/components/modal/AttendanceHero"
 import { AttendanceHistory } from "@/components/modal/AttendanceHistory"
 import { ManualEntryDialog } from "@/components/modal/ManualEntryDialog"
+import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
 
 interface AttendanceEntry {
   id: string
@@ -51,8 +52,9 @@ export default function AttendancePage() {
   const [entries, setEntries] = useState<AttendanceEntry[]>(INITIAL_ENTRIES)
   const [isPaused, setIsPaused] = useState(false)
   const [breakStartTime, setBreakStartTime] = useState<string | null>(null)
-
-  const TARGET_HOURS = 600
+  
+  const { data: settings } = useGetSettings()
+  const TARGET_HOURS = settings?.goalHours
 
   const activeEntry = useMemo(
     () => entries.find((e) => !e.clock_out),
