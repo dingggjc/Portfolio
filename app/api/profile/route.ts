@@ -1,4 +1,4 @@
-import { getUserId } from "@/app/api/auth/route"
+import { getUserId } from "@/services/supabase/server"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
