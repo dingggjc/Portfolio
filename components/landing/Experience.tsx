@@ -24,7 +24,7 @@ const Experience = ({
   heading = "Experience",
   experience = [
     {
-      period: "6 Months",
+      period: "8 Months",
       title: "Software Developer",
       description:
         "Developed frontend features for enterprise-level applications using React and Next.js, while managing backend logic and MySQL database structures via C#/.NET.",
