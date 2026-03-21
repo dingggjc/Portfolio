@@ -119,7 +119,7 @@ export default function SettingsPage() {
         <CardContent className="space-y-6 pt-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground/80 lowercase first-letter:uppercase">
+              <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground/80">
                 <HistoryIcon size={12} className="text-primary" />
                 <Label htmlFor="initial_hours">
                   Initial hours (Existing balance)
@@ -137,7 +137,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground/80 lowercase first-letter:uppercase">
+              <div className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground/80">
                 <TargetIcon size={12} className="text-primary" />
                 <Label htmlFor="goal_hours">Total goal hours (Target)</Label>
               </div>

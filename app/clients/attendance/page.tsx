@@ -2,81 +2,58 @@
 
 import { differenceInSeconds, format } from "date-fns"
 import { useMemo, useState } from "react"
-import { toast } from "sonner"
 
+import { useGetSession } from "@/app/hooks/attendance/useGetSession"
+import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
+import { useCreateSession } from "@/app/hooks/attendance/useCreateSession"
+import { useUpdateSession } from "@/app/hooks/attendance/useUpdateSession"
+import { useDeleteSession } from "@/app/hooks/attendance/useDeleteSession"
 import { AttendanceHero } from "@/components/modal/AttendanceHero"
 import { AttendanceHistory } from "@/components/modal/AttendanceHistory"
 import { ManualEntryDialog } from "@/components/modal/ManualEntryDialog"
-import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
+
 
 interface AttendanceEntry {
   id: string
-  clock_in: string
-  clock_out: string | null
-  date: string
-  break_seconds: number
+  clockIn: string
+  clockOut: string | null
+  data: string
+  break: number
+  status: string
 }
 
-const INITIAL_ENTRIES: AttendanceEntry[] = [
-  {
-    id: "1",
-    clock_in: "2026-03-18T08:00:00Z",
-    clock_out: "2026-03-18T17:00:00Z",
-    date: "2026-03-18",
-    break_seconds: 3600,
-  },
-  {
-    id: "2",
-    clock_in: "2026-03-17T08:30:00Z",
-    clock_out: "2026-03-17T17:30:00Z",
-    date: "2026-03-17",
-    break_seconds: 3600,
-  },
-  {
-    id: "3",
-    clock_in: "2026-03-16T09:00:00Z",
-    clock_out: "2026-03-16T15:00:00Z",
-    date: "2026-03-16",
-    break_seconds: 1800,
-  },
-  {
-    id: "4",
-    clock_in: "2026-03-15T08:00:00Z",
-    clock_out: "2026-03-15T12:00:00Z",
-    date: "2026-03-15",
-    break_seconds: 0,
-  },
-]
-
 export default function AttendancePage() {
-  const [entries, setEntries] = useState<AttendanceEntry[]>(INITIAL_ENTRIES)
-  const [isPaused, setIsPaused] = useState(false)
   const [breakStartTime, setBreakStartTime] = useState<string | null>(null)
-  
+
   const { data: settings } = useGetSettings()
+  const { data: sessionData = [] } = useGetSession()
+  const createSession = useCreateSession()
+  const updateSession = useUpdateSession()
+  const deleteSession = useDeleteSession()
   const TARGET_HOURS = settings?.goalHours
 
   const activeEntry = useMemo(
-    () => entries.find((e) => !e.clock_out),
-    [entries]
+    () => sessionData.find((e: AttendanceEntry) => !e.clockOut),
+    [sessionData]
   )
   const isClockedIn = !!activeEntry
+  const isPaused = activeEntry?.status === "paused"
 
   const stats = useMemo(() => {
     let totalMinutes = 0
     let todayMinutes = 0
     const todayStr = format(new Date(), "yyyy-MM-dd")
 
-    entries.forEach((entry) => {
-      if (entry.clock_out) {
+    sessionData.forEach((entry: AttendanceEntry) => {
+      if (entry.clockOut) {
         const diffSeconds =
           differenceInSeconds(
-            new Date(entry.clock_out),
-            new Date(entry.clock_in)
-          ) - (entry.break_seconds || 0)
+            new Date(entry.clockOut),
+            new Date(entry.clockIn)
+          ) - (entry.break || 0)
         const diffMinutes = diffSeconds / 60
         totalMinutes += diffMinutes
-        if (entry.date === todayStr) todayMinutes += diffMinutes
+        if (entry.data === todayStr) todayMinutes += diffMinutes
       }
     })
 
@@ -86,70 +63,52 @@ export default function AttendancePage() {
       todayHoursStr: (todayMinutes / 60).toFixed(1),
       remainingHoursStr: Math.max(TARGET_HOURS - totalHours, 0).toFixed(1),
       progress: Math.min((totalHours / TARGET_HOURS) * 100, 100),
-      totalDays: new Set(entries.map((e) => e.date)).size,
+      totalDays: new Set(sessionData.map((e: AttendanceEntry) => e.data)).size,
     }
-  }, [entries])
+  }, [sessionData, TARGET_HOURS])
 
   function toggleClock() {
-    const now = new Date()
-    const nowISO = now.toISOString()
-    const today = format(now, "yyyy-MM-dd")
-
     if (isClockedIn) {
-      const updated = entries.map((e) => {
-        if (!e.clock_out) {
-          let finalBreaks = e.break_seconds
-          if (isPaused && breakStartTime) {
-            finalBreaks += differenceInSeconds(now, new Date(breakStartTime))
-          }
-          return { ...e, clock_out: nowISO, break_seconds: finalBreaks }
-        }
-        return e
+      updateSession.mutate({
+        id: activeEntry.id,
+        clockOut: new Date().toISOString(),
+        break: isPaused && breakStartTime ? 
+          Math.floor(differenceInSeconds(new Date(), new Date(breakStartTime))) + (activeEntry.break || 0) : activeEntry.break || 0,
+        status: "completed"
       })
-      setEntries(updated)
-      setIsPaused(false)
       setBreakStartTime(null)
-      toast.success("Session finalized and saved")
     } else {
-      const newEntry: AttendanceEntry = {
-        id: Math.random().toString(36).substr(2, 9),
-        clock_in: nowISO,
-        date: today,
-        clock_out: null,
-        break_seconds: 0,
-      }
-      setEntries([newEntry, ...entries])
-      setIsPaused(false)
-      toast.success("New session started")
+      createSession.mutate({
+        clockIn: new Date().toISOString(),
+        status: "active"
+      })
     }
   }
 
   function handlePause() {
     if (!isClockedIn || isPaused) return
-    setIsPaused(true)
+    
+    const breakDuration = breakStartTime ? 
+      Math.floor(differenceInSeconds(new Date(), new Date(breakStartTime))) : 0
+    
+    updateSession.mutate({
+      id: activeEntry.id,
+      break: (activeEntry.break || 0) + breakDuration,
+      status: "paused"
+    })
+    
     setBreakStartTime(new Date().toISOString())
-    toast.info("Session paused (Break started)")
   }
 
   function handleResume() {
     if (!isClockedIn || !isPaused || !breakStartTime) return
-
-    const breakDuration = differenceInSeconds(
-      new Date(),
-      new Date(breakStartTime)
-    )
-
-    const updated = entries.map((e) => {
-      if (e.id === activeEntry?.id) {
-        return { ...e, break_seconds: (e.break_seconds || 0) + breakDuration }
-      }
-      return e
+    
+    updateSession.mutate({
+      id: activeEntry.id,
+      status: "active"
     })
-
-    setEntries(updated)
-    setIsPaused(false)
+    
     setBreakStartTime(null)
-    toast.success("Session resumed")
   }
 
   function handleManualAdd(entry: {
@@ -158,20 +117,12 @@ export default function AttendancePage() {
     clock_out: string
     break_minutes: number
   }) {
-    const newEntry: AttendanceEntry = {
-      id: Math.random().toString(36).substr(2, 9),
-      date: entry.date,
-      clock_in: entry.clock_in,
-      clock_out: entry.clock_out,
-      break_seconds: entry.break_minutes * 60,
-    }
-    setEntries(
-      [newEntry, ...entries].sort(
-        (a, b) =>
-          new Date(b.clock_in).getTime() - new Date(a.clock_in).getTime()
-      )
-    )
-    toast.success("Manual entry added")
+    createSession.mutate({
+      clockIn: entry.clock_in,
+      clockOut: entry.clock_out,
+      break: entry.break_minutes * 60,
+      status: "completed"
+    })
   }
 
   return (
@@ -182,7 +133,7 @@ export default function AttendancePage() {
             Attendance Log
           </h1>
           <p className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase opacity-70">
-            Dummy data mode • Training performance
+            Live data mode • Training performance
           </p>
         </div>
 
@@ -195,8 +146,8 @@ export default function AttendancePage() {
         onToggle={toggleClock}
         onPause={handlePause}
         onResume={handleResume}
-        startTime={activeEntry?.clock_in}
-        totalPausedSeconds={activeEntry?.break_seconds || 0}
+        startTime={activeEntry?.clockIn}
+        totalPausedSeconds={activeEntry?.break || 0}
         totalHours={stats.totalHoursStr}
         remainingHours={stats.remainingHoursStr}
         todayHours={stats.todayHoursStr}
@@ -205,7 +156,7 @@ export default function AttendancePage() {
         targetHours={TARGET_HOURS}
       />
 
-      <AttendanceHistory entries={entries} />
+      <AttendanceHistory entries={sessionData} onDelete={deleteSession.mutate} />
     </div>
   )
 }

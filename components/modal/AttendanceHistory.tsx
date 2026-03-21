@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { format, differenceInMinutes, differenceInSeconds } from "date-fns"
+import { Trash2Icon } from "lucide-react"
 import { 
   Table,
   TableBody,
@@ -11,18 +12,22 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { HistoryIcon } from "lucide-react"
 
 interface AttendanceEntry {
   id: string
-  clock_in: string
-  clock_out: string | null
-  date: string
+  clockIn: string
+  clockOut: string | null
+  data: string
+  break: number
+  status: string
 }
 
 interface AttendanceHistoryProps {
   entries: AttendanceEntry[]
+  onDelete?: (id: string) => void
 }
 
 function RunningTimer({ startTimeISO }: { startTimeISO: string }) {
@@ -49,7 +54,7 @@ function RunningTimer({ startTimeISO }: { startTimeISO: string }) {
   return <span className="font-mono font-bold text-primary">{elapsed}</span>
 }
 
-export function AttendanceHistory({ entries }: AttendanceHistoryProps) {
+export function AttendanceHistory({ entries, onDelete }: AttendanceHistoryProps) {
   return (
     <Card className="shadow-md border-primary/10 overflow-hidden">
       <CardHeader className="pb-0 bg-muted/10 border-b border-primary/5">
@@ -67,33 +72,46 @@ export function AttendanceHistory({ entries }: AttendanceHistoryProps) {
               <TableHead className="text-[11px] font-bold uppercase tracking-wider">Clock Out</TableHead>
               <TableHead className="text-right text-[11px] font-bold uppercase tracking-wider">Total Duration</TableHead>
               <TableHead className="text-right pr-8 text-[11px] font-bold uppercase tracking-wider">Status</TableHead>
+              <TableHead className="text-right pr-8 text-[11px] font-bold uppercase tracking-wider">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {entries.map((e) => (
               <TableRow key={e.id} className="hover:bg-muted/30">
-                <TableCell className="font-bold pl-8">{format(new Date(e.date), "MMM dd, yyyy")}</TableCell>
-                <TableCell className="text-muted-foreground font-medium">{format(new Date(e.clock_in), "p")}</TableCell>
+                <TableCell className="font-bold pl-8">{format(new Date(e.data), "MMM dd, yyyy")}</TableCell>
+                <TableCell className="text-muted-foreground font-medium">{format(new Date(e.clockIn), "p")}</TableCell>
                 <TableCell className="text-muted-foreground font-medium">
-                  {e.clock_out ? format(new Date(e.clock_out), "p") : <RunningTimer startTimeISO={e.clock_in} />}
+                  {e.clockOut ? format(new Date(e.clockOut), "p") : <RunningTimer startTimeISO={e.clockIn} />}
                 </TableCell>
                 <TableCell className="text-right font-black tabular-nums">
-                  {e.clock_out ? (
-                    `${Math.floor(differenceInMinutes(new Date(e.clock_out), new Date(e.clock_in))/60)}h ${differenceInMinutes(new Date(e.clock_out), new Date(e.clock_in))%60}m`
+                  {e.clockOut ? (
+                    `${Math.floor(differenceInMinutes(new Date(e.clockOut), new Date(e.clockIn))/60)}h ${differenceInMinutes(new Date(e.clockOut), new Date(e.clockIn))%60}m`
                   ) : (
                     <span className="text-[10px] text-muted-foreground/50 italic">Ongoing...</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right pr-8">
-                  <Badge variant={e.clock_out ? "secondary" : "default"} className="font-black text-[9px] px-2 h-5 rounded-md uppercase tracking-wider">
-                    {e.clock_out ? "Logged" : "Active"}
+                  <Badge variant={e.status === "completed" ? "secondary" : e.status === "paused" ? "outline" : "default"} className="font-black text-[9px] px-2 h-5 rounded-md uppercase tracking-wider">
+                    {e.status === "completed" ? "Logged" : e.status === "paused" ? "Paused" : "Active"}
                   </Badge>
+                </TableCell>
+                <TableCell className="text-right pr-8">
+                  {onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(e.id)}
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2Icon size={14} />
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
             {entries.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground italic text-xs">
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground italic text-xs">
                   No session logs found.
                 </TableCell>
               </TableRow>
