@@ -8,5 +8,6 @@ export function useGetSession() {
       const data = await res.json()
       return data || null
     },
+    staleTime: 1000 * 60 * 5,
   })
 }

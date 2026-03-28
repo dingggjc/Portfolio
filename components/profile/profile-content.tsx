@@ -1,4 +1,7 @@
+"use client"
+
 import { Shield, Key, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +12,62 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { useUserProfile } from "@/app/hooks/useUserProfile";
+import { useUpdateProfile } from "@/app/hooks/useUpdateProfile";
 
 export default function ProfileContent() {
+  const { data: userProfile, isLoading } = useUserProfile();
+  const updateProfile = useUpdateProfile();
+  
+  const [formData, setFormData] = useState({
+    first_name: userProfile?.name?.split(' ')[0] || '',
+    last_name: userProfile?.name?.split(' ').slice(1).join(' ') || '',
+    email: userProfile?.email || '',
+    phone: '',
+    jobTitle: 'OJT Trainee',
+    company: '',
+    bio: 'Currently undergoing OJT training.',
+    location: 'Philippines',
+  });
+
+  const [notifications, setNotifications] = useState({
+    email: true,
+    attendanceReminders: true,
+    progressUpdates: true,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 w-20 bg-gray-200 rounded"></div>
+          <div className="h-10 w-full bg-gray-200 rounded"></div>
+          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-center text-muted-foreground">No profile data found</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const handleSaveProfile = () => {
+    updateProfile.mutate({
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      avatar_url: userProfile?.avatar,
+    });
+  };
+
   return (
     <Tabs defaultValue="personal" className="space-y-6">
       <TabsList className="grid w-full grid-cols-4">
@@ -31,27 +88,49 @@ export default function ProfileContent() {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
-                <Input id="firstName" defaultValue="John" />
+                <Input 
+                  id="firstName" 
+                  value={formData.first_name}
+                  onChange={(e) => setFormData(prev => ({...prev, first_name: e.target.value}))}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
-                <Input id="lastName" defaultValue="Doe" />
+                <Input 
+                  id="lastName" 
+                  value={formData.last_name}
+                  onChange={(e) => setFormData(prev => ({...prev, last_name: e.target.value}))}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                <Input id="email" type="email" value={formData.email} disabled />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" defaultValue="+1 (555) 123-4567" />
+                <Input 
+                  id="phone" 
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({...prev, phone: e.target.value}))}
+                  placeholder="+63 XXX XXX XXXX" 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="jobTitle">Job Title</Label>
-                <Input id="jobTitle" defaultValue="Senior Product Designer" />
+                <Input 
+                  id="jobTitle" 
+                  value={formData.jobTitle}
+                  onChange={(e) => setFormData(prev => ({...prev, jobTitle: e.target.value}))}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="company">Company</Label>
-                <Input id="company" defaultValue="Acme Inc." />
+                <Input 
+                  id="company" 
+                  value={formData.company}
+                  onChange={(e) => setFormData(prev => ({...prev, company: e.target.value}))}
+                  placeholder="Training Company" 
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -59,13 +138,26 @@ export default function ProfileContent() {
               <Textarea
                 id="bio"
                 placeholder="Tell us about yourself..."
-                defaultValue="Passionate product designer with 8+ years of experience creating user-centered digital experiences. I love solving complex problems and turning ideas into beautiful, functional products."
+                value={formData.bio}
+                onChange={(e) => setFormData(prev => ({...prev, bio: e.target.value}))}
                 rows={4}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
-              <Input id="location" defaultValue="San Francisco, CA" />
+              <Input 
+                id="location" 
+                value={formData.location}
+                onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button 
+                onClick={handleSaveProfile}
+                disabled={updateProfile.isPending}
+              >
+                {updateProfile.isPending ? "Saving..." : "Save Changes"}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -114,6 +206,24 @@ export default function ProfileContent() {
               </div>
               <Button variant="outline">Export Data</Button>
             </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-base">Account Type</Label>
+                <p className="text-muted-foreground text-sm">OJT Trainee Account</p>
+              </div>
+              <Button variant="outline">View Details</Button>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label className="text-base">Profile Visibility</Label>
+                <p className="text-muted-foreground text-sm">
+                  Make your profile visible to other users
+                </p>
+              </div>
+              <Switch defaultChecked />
+            </div>
           </CardContent>
         </Card>
 
@@ -151,7 +261,7 @@ export default function ProfileContent() {
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <Label className="text-base">Password</Label>
-                  <p className="text-muted-foreground text-sm">Last changed 3 months ago</p>
+                  <p className="text-muted-foreground text-sm">Last changed recently</p>
                 </div>
                 <Button variant="outline">
                   <Key className="mr-2 h-4 w-4" />
@@ -258,6 +368,26 @@ export default function ProfileContent() {
                   </p>
                 </div>
                 <Switch checked disabled />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label className="text-base">Attendance Reminders</Label>
+                  <p className="text-muted-foreground text-sm">
+                    Get reminded to log your training hours
+                  </p>
+                </div>
+                <Switch defaultChecked />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label className="text-base">Progress Updates</Label>
+                  <p className="text-muted-foreground text-sm">
+                    Get notified about your OJT progress milestones
+                  </p>
+                </div>
+                <Switch defaultChecked />
               </div>
             </div>
           </CardContent>

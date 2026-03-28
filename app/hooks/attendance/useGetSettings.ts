@@ -7,5 +7,6 @@ export function useGetSettings() {
       const res = await fetch("/api/attendance-settings")
       return res.json()
     },
+    staleTime: 1000 * 60 * 10,
   })
 }

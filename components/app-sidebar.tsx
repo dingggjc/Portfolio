@@ -1,5 +1,6 @@
 "use client"
 
+import { useUserProfile } from "@/app/hooks/useUserProfile"
 import * as React from "react"
 
 import { NavMain } from "@/components/nav-main"
@@ -21,12 +22,7 @@ import {
   TimerIcon,
 } from "lucide-react"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+const navData = {
   navMain: [
     {
       title: "Dashboard",
@@ -51,6 +47,14 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: userProfile } = useUserProfile()
+
+  const user = userProfile || {
+    name: "Loading...",
+    email: "",
+    avatar: "/avatars/default.jpg",
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -69,12 +73,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navData.navMain} />
 
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavSecondary items={navData.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

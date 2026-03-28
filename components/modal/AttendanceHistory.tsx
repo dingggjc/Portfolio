@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
+import React from "react"
 import { format, differenceInMinutes, differenceInSeconds } from "date-fns"
 import { Trash2Icon } from "lucide-react"
 import { 
@@ -15,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { HistoryIcon } from "lucide-react"
+import { DeleteConfirmDialog } from "@/components/modal/DeleteConfirmDialog"
 
 interface AttendanceEntry {
   id: string
@@ -28,6 +30,7 @@ interface AttendanceEntry {
 interface AttendanceHistoryProps {
   entries: AttendanceEntry[]
   onDelete?: (id: string) => void
+  isDeleting?: boolean
 }
 
 function RunningTimer({ startTimeISO }: { startTimeISO: string }) {
@@ -54,12 +57,51 @@ function RunningTimer({ startTimeISO }: { startTimeISO: string }) {
   return <span className="font-mono font-bold text-primary">{elapsed}</span>
 }
 
-export function AttendanceHistory({ entries, onDelete }: AttendanceHistoryProps) {
+export function AttendanceHistory({ entries, onDelete, isDeleting = false }: AttendanceHistoryProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [entryToDelete, setEntryToDelete] = useState<string | null>(null)
+  const prevIsDeleting = useRef(isDeleting)
+
+  useEffect(() => {
+    if (prevIsDeleting.current && !isDeleting) {
+      setDeleteDialogOpen(false)
+      setEntryToDelete(null)
+    }
+    prevIsDeleting.current = isDeleting
+  }, [isDeleting])
+
+  const handleDeleteClick = (id: string) => {
+    setEntryToDelete(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (entryToDelete && onDelete) {
+      onDelete(entryToDelete)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    if (!isDeleting) {
+      setDeleteDialogOpen(false)
+      setEntryToDelete(null)
+    }
+  }
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setDeleteDialogOpen(open)
+      setEntryToDelete(null)
+    } else {
+
+      setDeleteDialogOpen(open)
+    }
+  }
   return (
     <Card className="shadow-md border-primary/10 overflow-hidden">
       <CardHeader className="pb-0 bg-muted/10 border-b border-primary/5">
         <CardTitle className="text-lg flex items-center gap-2 font-bold pb-2">
-          <HistoryIcon size={18} className="text-primary" /> Recent Sessions
+          <HistoryIcon size={18} className="text-primary" /> Recent Work
         </CardTitle>
         <CardDescription className="pb-4">A complete log of your tracked working hours.</CardDescription>
       </CardHeader>
@@ -70,7 +112,7 @@ export function AttendanceHistory({ entries, onDelete }: AttendanceHistoryProps)
               <TableHead className="w-[180px] pl-8 text-[11px] font-bold uppercase tracking-wider">Date</TableHead>
               <TableHead className="text-[11px] font-bold uppercase tracking-wider">Clock In</TableHead>
               <TableHead className="text-[11px] font-bold uppercase tracking-wider">Clock Out</TableHead>
-              <TableHead className="text-right text-[11px] font-bold uppercase tracking-wider">Total Duration</TableHead>
+              <TableHead className="text-right text-[11px] font-bold uppercase tracking-wider">Work Duration</TableHead>
               <TableHead className="text-right pr-8 text-[11px] font-bold uppercase tracking-wider">Status</TableHead>
               <TableHead className="text-right pr-8 text-[11px] font-bold uppercase tracking-wider">Actions</TableHead>
             </TableRow>
@@ -100,7 +142,7 @@ export function AttendanceHistory({ entries, onDelete }: AttendanceHistoryProps)
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onDelete(e.id)}
+                      onClick={() => handleDeleteClick(e.id)}
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2Icon size={14} />
@@ -112,13 +154,20 @@ export function AttendanceHistory({ entries, onDelete }: AttendanceHistoryProps)
             {entries.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="h-32 text-center text-muted-foreground italic text-xs">
-                  No session logs found.
+                  No work logs found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </CardContent>
+      
+      <DeleteConfirmDialog 
+        open={deleteDialogOpen} 
+        onOpenChange={handleDialogOpenChange}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting}
+      />
     </Card>
   )
 }

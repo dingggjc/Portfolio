@@ -38,6 +38,7 @@ interface AttendanceHeroProps {
   totalDays: number
   progress: number
   targetHours: number
+  isSubmitting: boolean
 }
 
 function Timer({ startTimeISO, totalPausedSeconds, isPaused }: { startTimeISO: string, totalPausedSeconds: number, isPaused: boolean }) {
@@ -79,7 +80,8 @@ export function AttendanceHero({
   todayHours, 
   totalDays, 
   progress, 
-  targetHours 
+  targetHours,
+  isSubmitting
 }: AttendanceHeroProps) {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
@@ -93,9 +95,9 @@ export function AttendanceHero({
       <Card className="lg:col-span-1 shadow-md border-primary/10">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg flex items-center gap-2 font-bold tracking-tight">
-            <ClockIcon size={18} className="text-primary" /> Tracking
+            <ClockIcon size={18} className="text-primary" /> Time Tracking
           </CardTitle>
-          <CardDescription className="text-[10px] font-semibold opacity-70">Active session control</CardDescription>
+          <CardDescription className="text-[10px] font-semibold opacity-70">Active work period control</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center pt-2 pb-6 gap-6">
           <div className="flex flex-col items-center gap-2 w-full">
@@ -127,9 +129,19 @@ export function AttendanceHero({
                 <Button 
                   size="default" 
                   onClick={onToggle}
+                  disabled={isSubmitting}
                   className="h-12 w-full text-sm font-bold rounded-xl shadow-lg bg-primary hover:bg-primary/90 text-white"
                 >
-                  <PlayIcon className="mr-2" size={16} /> Start Session
+                  {isSubmitting ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      Starting...
+                    </>
+                  ) : (
+                    <>
+                      <PlayIcon className="mr-2" size={16} /> Start Work Period
+                    </>
+                  )}
                 </Button>
               ) : (
                 <>
@@ -137,15 +149,26 @@ export function AttendanceHero({
                     <Button 
                       size="default" 
                       onClick={onResume}
+                      disabled={isSubmitting}
                       className="h-12 w-full text-sm font-bold rounded-xl shadow-lg bg-primary hover:bg-primary/90 text-white"
                     >
-                      <PlayIcon className="mr-2" size={16} /> Resume Session
+                      {isSubmitting ? (
+                        <>
+                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                          Resuming...
+                        </>
+                      ) : (
+                        <>
+                          <PlayIcon className="mr-2" size={16} /> Resume Work
+                        </>
+                      )}
                     </Button>
                   ) : (
                     <Button 
                       size="default" 
                       variant="outline"
                       onClick={onPause}
+                      disabled={isSubmitting}
                       className="h-12 w-full text-sm font-bold rounded-xl border-dashed border-primary/30 hover:bg-primary/5"
                     >
                       <PauseIcon className="mr-2" size={14} /> Take a break
@@ -159,7 +182,7 @@ export function AttendanceHero({
                         variant="ghost"
                         className="h-9 w-full text-[11px] font-bold text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors group"
                       >
-                        <StopCircleIcon className="mr-2 opacity-50 group-hover:opacity-100" size={12} /> Finish & save session
+                        <StopCircleIcon className="mr-2 opacity-50 group-hover:opacity-100" size={12} /> Finish & save work
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[400px]">
@@ -167,9 +190,9 @@ export function AttendanceHero({
                         <div className="bg-destructive/10 size-12 rounded-full flex items-center justify-center mb-4">
                           <AlertCircleIcon size={24} className="text-destructive" />
                         </div>
-                        <DialogTitle className="text-xl font-black tracking-tight text-foreground">Finalize training session?</DialogTitle>
+                        <DialogTitle className="text-xl font-black tracking-tight text-foreground">Finalize work period?</DialogTitle>
                         <DialogDescription className="text-sm font-medium leading-relaxed pt-2">
-                          Are you sure you want to clock out? This will calculate your net training duration (excluding any break time) and add it to your logs.
+                          Are you sure you want to clock out? This will calculate your net work duration (excluding any break time) and add it to your logs.
                         </DialogDescription>
                       </DialogHeader>
                       
@@ -179,7 +202,7 @@ export function AttendanceHero({
                           <div className="space-y-1">
                             <p className="text-[11px] font-bold text-foreground">How it works</p>
                             <p className="text-[11px] text-muted-foreground font-medium leading-normal">
-                              Your total hours are calculated by taking the session length and subtracting any "Break" time you logged.
+                              Your total hours are calculated by taking the work period length and subtracting any "Break" time you logged.
                             </p>
                           </div>
                         </div>
@@ -188,7 +211,7 @@ export function AttendanceHero({
                           <div className="space-y-1">
                             <p className="text-[11px] font-bold text-foreground">Next steps</p>
                             <p className="text-[11px] text-muted-foreground font-medium leading-normal">
-                              Once saved, this session will appear in your "Recent Sessions" table and contribute to your 600h requirement.
+                              Once saved, this work period will appear in your "Recent Work" table and contribute to your 600h requirement.
                             </p>
                           </div>
                         </div>
@@ -204,9 +227,17 @@ export function AttendanceHero({
                         </Button>
                         <Button 
                           onClick={handleFinalize}
+                          disabled={isSubmitting}
                           className="bg-destructive hover:bg-destructive/90 text-white text-xs font-bold rounded-lg px-6"
                         >
-                          Yes, finish session
+                          {isSubmitting ? (
+                            <>
+                              <div className="mr-2 h-3 w-3 animate-spin rounded-full border border-white border-t-transparent"></div>
+                              Finishing...
+                            </>
+                          ) : (
+                            "Yes, finish work"
+                          )}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
