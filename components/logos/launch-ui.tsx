@@ -15,5 +15,5 @@ const LaunchUI = (props: React.SVGProps<SVGSVGElement>) => (
     <path d="M11.25 18V16.5L21 6.75V8.25L11.25 18Z" fill="currentColor" />
     <path d="M11.25 21V19.5L15 15.75V17.25L11.25 21Z" fill="currentColor" />
   </svg>
-);
-export default LaunchUI;
+)
+export default LaunchUI

@@ -3,8 +3,8 @@ import { Geist_Mono, Inter } from "next/font/google"
 import TanstackProvider from "@/components/layout/TanstackProvider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { Toaster } from "sonner"
 import { cn } from "@/lib/utils"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -40,19 +40,22 @@ export default function RootLayout({
           <TooltipProvider>
             <ThemeProvider>
               {children}
-              <Toaster 
-  position="top-right" 
-  theme="system"
-  className="bg-background text-foreground border-border"
-  toastOptions={{
-    classNames: {
-      toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-      description: "group-[.toast]:text-muted-foreground",
-      actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-      cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-    },
-  }}
-/>
+              <Toaster
+                position="top-right"
+                theme="system"
+                className="border-border bg-background text-foreground"
+                toastOptions={{
+                  classNames: {
+                    toast:
+                      "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
+                    description: "group-[.toast]:text-muted-foreground",
+                    actionButton:
+                      "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+                    cancelButton:
+                      "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+                  },
+                }}
+              />
             </ThemeProvider>
           </TooltipProvider>
         </TanstackProvider>

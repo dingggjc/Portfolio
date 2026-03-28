@@ -186,7 +186,7 @@ export function LoginForm({
                   disabled={isLoading}
                   className="w-full"
                 >
-                  Login with Google
+                  {isLogin ? "Login with Google" : "Sign up with Google"}
                 </Button>
                 <FieldDescription className="text-center">
                   {isLogin ? (
