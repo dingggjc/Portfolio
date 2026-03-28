@@ -41,6 +41,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/auth") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/projects") ||
+    pathname.startsWith("/others") ||
     pathname === "/"
 
   if (!user && !isPublicPath) {
