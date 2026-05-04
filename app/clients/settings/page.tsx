@@ -116,7 +116,7 @@ export default function SettingsPage() {
     )
   }
 
-  function save(section: "requirements" | "mentor" | "fields", extra?: object) {
+  function save(section: "requirements" | "mentor" | "fields" | "schedule", extra?: object) {
     setSavingSection(section)
     saveSettings(
       {

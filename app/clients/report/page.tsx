@@ -5,7 +5,7 @@ import { format, differenceInCalendarDays } from "date-fns"
 import { useGetSession } from "@/app/hooks/attendance/useGetSession"
 import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
 import { useUserProfile } from "@/app/hooks/useUserProfile"
-import { DEFAULT_PRACTICE_FIELDS } from "@/lib/attendance-constants"
+import { DEFAULT_PRACTICE_FIELDS, PracticeField } from "@/lib/attendance-constants"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PrinterIcon, DownloadIcon } from "lucide-react"
@@ -31,7 +31,7 @@ export default function ReportPage() {
 
   const isLoading = sessionsLoading || settingsLoading || profileLoading
 
-  const practiceFields = settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS
+  const practiceFields = (settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS) as PracticeField[]
   const goalHours = settings?.goalHours ?? 3840
   const initialBalance = settings?.initialBalance ?? 0
   const mentorInfo = settings?.mentorInfo ?? {}
