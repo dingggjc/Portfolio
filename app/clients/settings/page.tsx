@@ -9,13 +9,25 @@ import { Button } from "@/components/ui/button"
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
 } from "@/components/ui/card"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   HistoryIcon, SaveIcon, Settings2Icon, TargetIcon,
   RotateCcwIcon, BookOpenIcon, UserCheckIcon, CalendarIcon,
+  PlusIcon, Trash2Icon, CalendarDaysIcon,
 } from "lucide-react"
+import { toast } from "sonner"
 import { DEFAULT_PRACTICE_FIELDS, PracticeField } from "@/lib/attendance-constants"
 
 interface MentorInfo {
@@ -35,14 +47,17 @@ const EMPTY_MENTOR: MentorInfo = {
 
 export default function SettingsPage() {
   const { data: settingsData, isLoading, isError, refetch } = useGetSettings()
-  const { mutate: saveSettings, isPending } = usePutSettings()
+  const { mutate: saveSettings } = usePutSettings()
 
   const [initialHours, setInitialHours] = useState("")
   const [goalHours, setGoalHours] = useState("")
   const [targetDate, setTargetDate] = useState("")
   const [practiceFields, setPracticeFields] = useState<PracticeField[]>(DEFAULT_PRACTICE_FIELDS)
   const [mentor, setMentor] = useState<MentorInfo>(EMPTY_MENTOR)
+  const [restDays, setRestDays] = useState<number[]>([0, 6])
   const [hydrated, setHydrated] = useState(false)
+  const [fieldToDelete, setFieldToDelete] = useState<PracticeField | null>(null)
+  const [savingSection, setSavingSection] = useState<"requirements" | "mentor" | "fields" | "schedule" | null>(null)
 
   useEffect(() => {
     if (settingsData && !hydrated) {
@@ -51,6 +66,7 @@ export default function SettingsPage() {
       setTargetDate(settingsData.targetDate?.slice(0, 10) || "")
       setPracticeFields(settingsData.practiceFields ?? DEFAULT_PRACTICE_FIELDS)
       setMentor({ ...EMPTY_MENTOR, ...(settingsData.mentorInfo ?? {}) })
+      setRestDays(settingsData.restDays ?? [0, 6])
       setHydrated(true)
     }
   }, [settingsData, hydrated])
@@ -65,7 +81,43 @@ export default function SettingsPage() {
     setMentor((prev) => ({ ...prev, [key]: value }))
   }
 
-  function save(extra?: object) {
+  function addField() {
+    const letterIds = practiceFields.map((f) => f.id).filter((id) => /^[A-Z]$/.test(id)).sort()
+    const last = letterIds.at(-1)
+    const nextId = last && last < "Z" ? String.fromCharCode(last.charCodeAt(0) + 1) : `${practiceFields.length + 1}`
+    setPracticeFields((prev) => [...prev, { id: nextId, description: "", percentage: 0, minHours: 0, initialHours: 0 }])
+  }
+
+  function confirmRemoveField() {
+    if (!fieldToDelete) return
+    const updatedFields = practiceFields.filter((f) => f.id !== fieldToDelete.id)
+    const removedId = fieldToDelete.id
+    setFieldToDelete(null)
+    setPracticeFields(updatedFields)
+    saveSettings(
+      {
+        goalHours: Number(goalHours) || 40,
+        initialBalance: Number(initialHours) || 0,
+        practiceFields: updatedFields,
+        mentorInfo: mentor,
+        targetDate: targetDate || null,
+        restDays,
+      },
+      {
+        onSuccess: () => {
+          refetch()
+          toast.success(`Field ${removedId} removed and saved`)
+        },
+        onError: () => {
+          setPracticeFields(practiceFields)
+          toast.error("Failed to remove field — changes reverted")
+        },
+      }
+    )
+  }
+
+  function save(section: "requirements" | "mentor" | "fields", extra?: object) {
+    setSavingSection(section)
     saveSettings(
       {
         goalHours: Number(goalHours) || 40,
@@ -73,9 +125,13 @@ export default function SettingsPage() {
         practiceFields,
         mentorInfo: mentor,
         targetDate: targetDate || null,
+        restDays,
         ...extra,
       },
-      { onSuccess: () => refetch() }
+      {
+        onSuccess: () => { refetch(); setSavingSection(null) },
+        onError: () => setSavingSection(null),
+      }
     )
   }
 
@@ -124,7 +180,16 @@ export default function SettingsPage() {
               Configure your training goals and history.
             </CardDescription>
           </div>
-          <BalanceCalculator onApply={(v) => setInitialHours(v.toString())} />
+          <BalanceCalculator
+            practiceFields={practiceFields}
+            goalHours={Number(goalHours) || undefined}
+            onApply={(v, fieldHours) => {
+              setInitialHours(v.toString())
+              setPracticeFields((prev) =>
+                prev.map((f) => ({ ...f, initialHours: fieldHours[f.id] ?? f.initialHours ?? 0 }))
+              )
+            }}
+          />
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           <div className="grid gap-6 md:grid-cols-3">
@@ -157,9 +222,9 @@ export default function SettingsPage() {
             </div>
           </div>
           <div className="flex justify-end border-t border-primary/5 pt-2">
-            <Button onClick={() => save()} disabled={isPending}
+            <Button onClick={() => save("requirements")} disabled={savingSection === "requirements"}
               className="h-9 gap-2 rounded-lg bg-primary px-6 text-[11px] font-bold text-white shadow-sm hover:bg-primary/90 active:scale-95 disabled:opacity-50">
-              <SaveIcon size={14} /> {isPending ? "Saving..." : "Save requirements"}
+              <SaveIcon size={14} /> {savingSection === "requirements" ? "Saving..." : "Save requirements"}
             </Button>
           </div>
         </CardContent>
@@ -203,9 +268,9 @@ export default function SettingsPage() {
             ))}
           </div>
           <div className="flex justify-end border-t border-primary/5 pt-2">
-            <Button onClick={() => save()} disabled={isPending}
+            <Button onClick={() => save("mentor")} disabled={savingSection === "mentor"}
               className="h-9 gap-2 rounded-lg bg-primary px-6 text-[11px] font-bold text-white shadow-sm hover:bg-primary/90 active:scale-95 disabled:opacity-50">
-              <SaveIcon size={14} /> {isPending ? "Saving..." : "Save info"}
+              <SaveIcon size={14} /> {savingSection === "mentor" ? "Saving..." : "Save info"}
             </Button>
           </div>
         </CardContent>
@@ -222,20 +287,27 @@ export default function SettingsPage() {
               PRC categories for time allocation (DT Form 001).
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={() => setPracticeFields(DEFAULT_PRACTICE_FIELDS)}
-            className="h-8 gap-1.5 text-[11px] font-bold border-primary/20 hover:bg-primary/5">
-            <RotateCcwIcon size={12} /> Reset defaults
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={addField}
+              className="h-8 gap-1.5 text-[11px] font-bold border-primary/20 hover:bg-primary/5">
+              <PlusIcon size={12} /> Add field
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setPracticeFields(DEFAULT_PRACTICE_FIELDS)}
+              className="h-8 gap-1.5 text-[11px] font-bold border-primary/20 hover:bg-primary/5">
+              <RotateCcwIcon size={12} /> Reset
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="pt-6 space-y-3">
-          <div className="hidden md:grid grid-cols-[2rem_1fr_5rem_6rem] gap-3 px-4 pb-1">
+          <div className="hidden md:grid grid-cols-[2rem_1fr_5rem_6rem_2rem] gap-3 px-4 pb-1">
             <span />
             <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-wider">Description</span>
             <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-wider text-center">% (Max)</span>
             <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-wider text-center">Min Hrs</span>
+            <span />
           </div>
           {practiceFields.map((field) => (
-            <div key={field.id} className="grid grid-cols-[2rem_1fr] md:grid-cols-[2rem_1fr_5rem_6rem] gap-3 items-center rounded-xl border border-primary/5 bg-muted/20 px-4 py-3">
+            <div key={field.id} className="grid grid-cols-[2rem_1fr_2rem] md:grid-cols-[2rem_1fr_5rem_6rem_2rem] gap-3 items-center rounded-xl border border-primary/5 bg-muted/20 px-4 py-3">
               <div className="size-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <span className="text-[11px] font-black text-primary">{field.id}</span>
               </div>
@@ -243,10 +315,16 @@ export default function SettingsPage() {
                 className="h-8 text-[12px] font-medium border-primary/10 focus-visible:ring-primary rounded-lg bg-background" />
               <Input type="number" min="0" max="100" value={field.percentage}
                 onChange={(e) => updateField(field.id, "percentage", parseFloat(e.target.value) || 0)}
-                className="h-8 text-[12px] font-bold text-center border-primary/10 focus-visible:ring-primary rounded-lg bg-background" />
+                className="hidden md:block h-8 text-[12px] font-bold text-center border-primary/10 focus-visible:ring-primary rounded-lg bg-background" />
               <Input type="number" min="0" value={field.minHours}
                 onChange={(e) => updateField(field.id, "minHours", parseFloat(e.target.value) || 0)}
-                className="h-8 text-[12px] font-bold text-center border-primary/10 focus-visible:ring-primary rounded-lg bg-background" />
+                className="hidden md:block h-8 text-[12px] font-bold text-center border-primary/10 focus-visible:ring-primary rounded-lg bg-background" />
+              <button
+                onClick={() => setFieldToDelete(field)}
+                className="size-7 flex items-center justify-center rounded-lg text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10 transition-colors"
+              >
+                <Trash2Icon size={13} />
+              </button>
             </div>
           ))}
           <div className={`flex items-center justify-end gap-2 px-4 pt-1 text-[11px] font-bold ${totalPct === 100 ? "text-primary" : "text-destructive"}`}>
@@ -255,13 +333,95 @@ export default function SettingsPage() {
             {totalPct !== 100 && <span className="text-[10px] font-medium text-destructive/70">(should be 100%)</span>}
           </div>
           <div className="flex justify-end border-t border-primary/5 pt-2">
-            <Button onClick={() => save()} disabled={isPending}
+            <Button onClick={() => save("fields")} disabled={savingSection === "fields"}
               className="h-9 gap-2 rounded-lg bg-primary px-6 text-[11px] font-bold text-white shadow-sm hover:bg-primary/90 active:scale-95 disabled:opacity-50">
-              <SaveIcon size={14} /> {isPending ? "Saving..." : "Save fields"}
+              <SaveIcon size={14} /> {savingSection === "fields" ? "Saving..." : "Save fields"}
             </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Work Schedule */}
+      <Card className="overflow-hidden border-primary/10 shadow-md">
+        <CardHeader className="border-b border-primary/5 bg-muted/5 pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg font-bold tracking-tight">
+            <CalendarDaysIcon size={18} className="text-primary" /> Work Schedule
+          </CardTitle>
+          <CardDescription className="text-[11px] font-medium italic opacity-70">
+            Mark your rest days — they won&apos;t break your attendance streak.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5 pt-6">
+          <div className="space-y-3">
+            <p className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider">Select rest days (days off)</p>
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { label: "Sun", value: 0 },
+                { label: "Mon", value: 1 },
+                { label: "Tue", value: 2 },
+                { label: "Wed", value: 3 },
+                { label: "Thu", value: 4 },
+                { label: "Fri", value: 5 },
+                { label: "Sat", value: 6 },
+              ].map((day) => {
+                const isRest = restDays.includes(day.value)
+                return (
+                  <button
+                    key={day.value}
+                    type="button"
+                    onClick={() =>
+                      setRestDays((prev) =>
+                        isRest ? prev.filter((d) => d !== day.value) : [...prev, day.value]
+                      )
+                    }
+                    className={`h-10 w-14 rounded-xl text-[11px] font-black tracking-wide border transition-all duration-150 select-none
+                      ${isRest
+                        ? "border-primary/20 bg-muted/40 text-muted-foreground/40 line-through"
+                        : "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
+                      }`}
+                  >
+                    {day.label}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-[10px] text-muted-foreground/40 font-medium">
+              {restDays.length === 0
+                ? "No rest days — streak counts every day"
+                : `Rest days: ${restDays.sort().map(d => ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d]).join(", ")} · Streak skips these`}
+            </p>
+          </div>
+          <div className="flex justify-end border-t border-primary/5 pt-2">
+            <Button onClick={() => save("schedule")} disabled={savingSection === "schedule"}
+              className="h-9 gap-2 rounded-lg bg-primary px-6 text-[11px] font-bold text-white shadow-sm hover:bg-primary/90 active:scale-95 disabled:opacity-50">
+              <SaveIcon size={14} /> {savingSection === "schedule" ? "Saving..." : "Save schedule"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <AlertDialog open={!!fieldToDelete} onOpenChange={(open) => { if (!open) setFieldToDelete(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-black tracking-tight">Remove Field {fieldToDelete?.id}?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[12px] leading-relaxed">
+              This will remove <strong>Field {fieldToDelete?.id}</strong>
+              {fieldToDelete?.description ? ` — ${fieldToDelete.description.split(",")[0]}` : ""}.
+              Any logged hours split to this field will no longer appear in progress charts.
+              This action cannot be undone without resetting to defaults.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="text-[11px] font-bold">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRemoveField}
+              className="bg-destructive text-white hover:bg-destructive/90 text-[11px] font-bold"
+            >
+              <Trash2Icon size={13} className="mr-1.5" /> Remove field
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

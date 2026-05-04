@@ -43,7 +43,7 @@ export function FieldDistributionChart({
 
   const { chartData, chartConfig, totalSplit } = useMemo(() => {
     const totals: Record<string, number> = {}
-    fields.forEach((f) => (totals[f.id] = 0))
+    fields.forEach((f) => (totals[f.id] = f.initialHours ?? 0))
 
     sessions.forEach((s) => {
       if (!s.splits || !s.clockOut) return

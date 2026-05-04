@@ -6,7 +6,8 @@ export async function updateUserSettings(
   balance: number,
   practiceFields?: object,
   mentorInfo?: object,
-  targetDate?: string | null
+  targetDate?: string | null,
+  restDays?: number[]
 ) {
   if (balance > goal) {
     throw new Error("Initial balance cannot exceed goal hours.")
@@ -18,6 +19,7 @@ export async function updateUserSettings(
     ...(targetDate !== undefined
       ? { targetDate: targetDate ? new Date(targetDate) : null }
       : {}),
+    ...(restDays !== undefined ? { restDays } : {}),
   }
 
   return await prisma.attendance_settings.upsert({

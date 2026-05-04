@@ -50,6 +50,14 @@ function getDayTextColor(hours: number): string {
   return ""
 }
 
+function hasNoteForDay(sessions: Session[], day: Date): boolean {
+  const dayStr = format(day, "yyyy-MM-dd")
+  return sessions.some((s) => {
+    const sDate = s.data?.slice(0, 10) ?? format(new Date(s.clockIn), "yyyy-MM-dd")
+    return sDate === dayStr && !!s.notes?.trim()
+  })
+}
+
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 export default function CalendarPage() {
@@ -158,6 +166,7 @@ export default function CalendarPage() {
                     const selected = selectedDay && isSameDay(day, selectedDay)
                     const bgColor = inMonth ? getDayColor(hours) : ""
                     const textColor = inMonth ? getDayTextColor(hours) : ""
+                    const hasNote = inMonth && hasNoteForDay(sessions, day)
 
                     return (
                       <button
@@ -179,6 +188,9 @@ export default function CalendarPage() {
                           <span className={`text-[9px] font-black tabular-nums mt-0.5 ${hours >= 6 ? "text-white/90" : "text-primary/70"}`}>
                             {hours.toFixed(1)}h
                           </span>
+                        )}
+                        {hasNote && (
+                          <span className={`absolute bottom-1 right-1 size-1.5 rounded-full ${hours >= 6 ? "bg-white/70" : "bg-primary/60"}`} />
                         )}
                       </button>
                     )

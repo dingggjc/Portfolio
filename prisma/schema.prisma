@@ -520,6 +520,7 @@ model attendance_settings {
   practiceFields Json?
   mentorInfo     Json?
   targetDate     DateTime? @db.Date
+  restDays       Int[]     @default([0, 6])
   created_at     DateTime  @default(now()) @db.Timestamptz(6)
   lastUpdated    DateTime? @default(now()) @db.Timestamptz(6)
   users          users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)

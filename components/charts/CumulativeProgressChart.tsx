@@ -52,7 +52,7 @@ export function CumulativeProgressChart({
     if (completed.length === 0) return []
 
     let running = initialBalance
-    return completed.map((s) => {
+    const points = completed.map((s) => {
       const gross =
         (new Date(s.clockOut!).getTime() - new Date(s.clockIn).getTime()) /
         3600000
@@ -62,6 +62,16 @@ export function CumulativeProgressChart({
         hours: parseFloat(running.toFixed(2)),
       }
     })
+
+    // Prepend a starting point for the initial balance so the chart origin is visible
+    if (initialBalance > 0) {
+      points.unshift({
+        date: "Start",
+        hours: parseFloat(initialBalance.toFixed(2)),
+      })
+    }
+
+    return points
   }, [sessions, initialBalance])
 
   if (chartData.length === 0) {
@@ -94,7 +104,8 @@ export function CumulativeProgressChart({
           <TrendingUpIcon size={16} className="text-primary" /> Cumulative Progress
         </CardTitle>
         <CardDescription className="text-[10px] font-semibold opacity-60">
-          {currentHours.toFixed(1)}h logged · {pct.toFixed(0)}% of {goalHours}h goal
+          {currentHours.toFixed(1)}h total · {pct.toFixed(0)}% of {goalHours}h goal
+          {initialBalance > 0 && ` · includes ${initialBalance.toFixed(1)}h initial balance`}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">

@@ -11,6 +11,7 @@ export function usePutSettings() {
       practiceFields?: object
       mentorInfo?: object
       targetDate?: string | null
+      restDays?: number[]
     }) => {
       try {
         const res = await fetch("/api/attendance-settings", {

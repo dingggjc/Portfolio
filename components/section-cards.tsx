@@ -24,6 +24,7 @@ interface AttendanceSession {
 interface AttendanceSettings {
   goalHours?: number
   initialBalance?: number
+  restDays?: number[]
 }
 
 interface SectionCardsProps {
@@ -31,6 +32,7 @@ interface SectionCardsProps {
   settings?: AttendanceSettings
   isLoading?: boolean
 }
+
 
 export function SectionCards({ sessions = [], settings, isLoading = false }: SectionCardsProps) {
   if (isLoading) {
@@ -90,6 +92,7 @@ export function SectionCards({ sessions = [], settings, isLoading = false }: Sec
   const completionPercentage = goalHours > 0 ? Math.min(100, (effectiveHours / goalHours) * 100) : 0
 
   const hasActiveSession = sessions.some(session => session.status === "active" && !session.clockOut)
+
   return (
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
       <Card className="@container/card">
@@ -187,6 +190,7 @@ export function SectionCards({ sessions = [], settings, isLoading = false }: Sec
           </div>
         </CardFooter>
       </Card>
+
     </div>
   )
 }

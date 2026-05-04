@@ -21,7 +21,7 @@ export function FieldProgressBars({
 
   const totals = useMemo(() => {
     const t: Record<string, number> = {}
-    fields.forEach((f) => (t[f.id] = 0))
+    fields.forEach((f) => (t[f.id] = f.initialHours ?? 0))
     sessions.forEach((s) => {
       if (!s.splits || !s.clockOut) return
       fields.forEach((f) => { t[f.id] += s.splits?.[f.id] || 0 })
@@ -41,7 +41,8 @@ export function FieldProgressBars({
           {metCount}/{fields.length} fields meeting minimum hours
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3 pt-0">
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
         {fields.map((field) => {
           const done = totals[field.id] || 0
           const pct = field.minHours > 0 ? Math.min((done / field.minHours) * 100, 100) : 0
@@ -75,6 +76,7 @@ export function FieldProgressBars({
             </div>
           )
         })}
+        </div>
       </CardContent>
     </Card>
   )

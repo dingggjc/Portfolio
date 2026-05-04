@@ -3,6 +3,7 @@ export interface PracticeField {
   description: string
   percentage: number
   minHours: number
+  initialHours?: number
 }
 
 export const DEFAULT_PRACTICE_FIELDS: PracticeField[] = [
