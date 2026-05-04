@@ -5,11 +5,13 @@ export function useCreateSession() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: { 
+    mutationFn: async (data: {
       clockIn?: string
       clockOut?: string
       break?: number
       status?: string
+      splits?: Record<string, number> | null
+      notes?: string | null
     }) => {
       try {
         const res = await fetch("/api/attendance-sessions", {

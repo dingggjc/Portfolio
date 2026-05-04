@@ -26,8 +26,8 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const { clockIn, clockOut, break: breakSeconds, status } = body
-    
+    const { clockIn, clockOut, break: breakSeconds, status, splits, notes } = body
+
     const session = await prisma.attendance_sessions.create({
       data: {
         userId,
@@ -35,6 +35,8 @@ export async function POST(request: Request) {
         clockOut: clockOut ? new Date(clockOut) : null,
         break: breakSeconds || 0,
         status: status || "active",
+        splits: splits || null,
+        notes: notes || null,
         data: new Date(),
       },
     })
@@ -84,8 +86,8 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json()
-    const { id, clockIn, clockOut, break: breakSeconds, status } = body
-    
+    const { id, clockIn, clockOut, break: breakSeconds, status, splits, notes } = body
+
     const session = await prisma.attendance_sessions.update({
       where: { id },
       data: {
@@ -93,6 +95,8 @@ export async function PUT(request: Request) {
         clockOut: clockOut ? new Date(clockOut) : undefined,
         break: breakSeconds !== undefined ? breakSeconds : undefined,
         status: status || "active",
+        splits: splits !== undefined ? splits : undefined,
+        notes: notes !== undefined ? notes : undefined,
       },
     })
 

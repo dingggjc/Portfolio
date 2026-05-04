@@ -22,11 +22,14 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json()
-    const { goalHours, initialBalance } = body
+    const { goalHours, initialBalance, practiceFields, mentorInfo, targetDate } = body
     const settings = await updateUserSettings(
       userId,
       Number(goalHours),
-      Number(initialBalance)
+      Number(initialBalance),
+      practiceFields,
+      mentorInfo,
+      targetDate
     )
 
     return NextResponse.json(settings)

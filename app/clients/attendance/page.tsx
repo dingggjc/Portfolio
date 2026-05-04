@@ -11,6 +11,11 @@ import { useUpdateSession } from "@/app/hooks/attendance/useUpdateSession"
 import { AttendanceHero } from "@/components/modal/AttendanceHero"
 import { AttendanceHistory } from "@/components/modal/AttendanceHistory"
 import { ManualEntryDialog } from "@/components/modal/ManualEntryDialog"
+import { TimeSplitterDialog } from "@/components/modal/TimeSplitterDialog"
+import { DtFormReport } from "@/components/modal/DtFormReport"
+import { DEFAULT_PRACTICE_FIELDS, PracticeField } from "@/lib/attendance-constants"
+import { Button } from "@/components/ui/button"
+import { DownloadIcon } from "lucide-react"
 
 interface AttendanceEntry {
   id: string
@@ -19,10 +24,18 @@ interface AttendanceEntry {
   data: string
   break: number
   status: string
+  splits?: Record<string, number> | null
+  notes?: string | null
 }
 
 export default function AttendancePage() {
   const [breakStartTime, setBreakStartTime] = useState<string | null>(null)
+  const [splitterOpen, setSplitterOpen] = useState(false)
+  const [pendingSession, setPendingSession] = useState<{
+    clockOut: string
+    breakSeconds: number
+    durationHours: number
+  } | null>(null)
 
   const { data: settings, isLoading: settingsLoading } = useGetSettings()
   const { data: sessionData = [], isLoading: sessionsLoading } = useGetSession()
@@ -32,6 +45,9 @@ export default function AttendancePage() {
   const isCreating = createSession.isPending
   const isUpdating = updateSession.isPending
   const TARGET_HOURS = settings?.goalHours
+
+  const practiceFields: PracticeField[] =
+    settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS
 
   const activeEntry = useMemo(
     () => sessionData.find((e: AttendanceEntry) => !e.clockOut),
@@ -61,7 +77,7 @@ export default function AttendancePage() {
     const totalHours = totalMinutes / 60
     const initialBalance = settings?.initialBalance || 0
     const effectiveHours = totalHours + initialBalance
-    
+
     return {
       totalHoursStr: totalHours.toFixed(1),
       todayHoursStr: (todayMinutes / 60).toFixed(1),
@@ -72,25 +88,56 @@ export default function AttendancePage() {
   }, [sessionData, TARGET_HOURS, settings?.initialBalance])
 
   function toggleClock() {
-    if (isClockedIn) {
-      updateSession.mutate({
-        id: activeEntry.id,
-        clockOut: new Date().toISOString(),
-        break:
-          isPaused && breakStartTime
-            ? Math.floor(
-                differenceInSeconds(new Date(), new Date(breakStartTime))
-              ) + (activeEntry.break || 0)
-            : activeEntry.break || 0,
-        status: "completed",
-      })
-      setBreakStartTime(null)
-    } else {
+    if (!isClockedIn) {
       createSession.mutate({
         clockIn: new Date().toISOString(),
         status: "active",
       })
     }
+  }
+
+  function handleFinalize() {
+    if (!isClockedIn || !activeEntry) return
+
+    const clockOut = new Date().toISOString()
+    const breakSeconds =
+      isPaused && breakStartTime
+        ? Math.floor(
+            differenceInSeconds(new Date(), new Date(breakStartTime))
+          ) + (activeEntry.break || 0)
+        : activeEntry.break || 0
+
+    const grossSeconds = differenceInSeconds(
+      new Date(clockOut),
+      new Date(activeEntry.clockIn)
+    )
+    const netSeconds = Math.max(grossSeconds - breakSeconds, 0)
+    const durationHours = netSeconds / 3600
+
+    setPendingSession({ clockOut, breakSeconds, durationHours })
+    setSplitterOpen(true)
+  }
+
+  function handleSplitterSave(splits: Record<string, number> | null, notes: string | null) {
+    if (!pendingSession || !activeEntry) return
+
+    updateSession.mutate(
+      {
+        id: activeEntry.id,
+        clockOut: pendingSession.clockOut,
+        break: pendingSession.breakSeconds,
+        status: "completed",
+        splits,
+        notes,
+      },
+      {
+        onSuccess: () => {
+          setSplitterOpen(false)
+          setPendingSession(null)
+          setBreakStartTime(null)
+        },
+      }
+    )
   }
 
   const isSubmitting = isCreating || isUpdating
@@ -140,6 +187,43 @@ export default function AttendancePage() {
     deleteSession.mutate(id)
   }
 
+  function handleExportCSV() {
+    const rows = [
+      ["Date", "Clock In", "Clock Out", "Break (min)", "Net Hours", "Status", "Notes", "Splits"],
+      ...sessionData
+        .filter((e: AttendanceEntry) => e.clockOut)
+        .map((e: AttendanceEntry) => {
+          const gross =
+            (new Date(e.clockOut!).getTime() - new Date(e.clockIn).getTime()) / 3600000
+          const net = Math.max(gross - (e.break || 0) / 3600, 0)
+          const splitsStr = e.splits
+            ? Object.entries(e.splits)
+                .filter(([, v]) => (v as number) > 0)
+                .map(([k, v]) => `${k}:${(v as number).toFixed(2)}h`)
+                .join(" | ")
+            : ""
+          return [
+            e.data?.slice(0, 10) ?? "",
+            format(new Date(e.clockIn), "HH:mm"),
+            format(new Date(e.clockOut!), "HH:mm"),
+            Math.round((e.break || 0) / 60),
+            net.toFixed(2),
+            e.status,
+            `"${(e.notes ?? "").replace(/"/g, '""')}"`,
+            splitsStr,
+          ]
+        }),
+    ]
+    const csv = rows.map((r) => r.join(",")).join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `attendance-log-${format(new Date(), "yyyy-MM-dd")}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (settingsLoading || sessionsLoading) {
     return <AttendancePageSkeleton />
   }
@@ -156,13 +240,30 @@ export default function AttendancePage() {
           </p>
         </div>
 
-        <ManualEntryDialog onAdd={handleManualAdd} />
+        <div className="flex items-center gap-2 flex-wrap">
+          <DtFormReport
+            sessions={sessionData}
+            practiceFields={practiceFields}
+            goalHours={TARGET_HOURS || 0}
+            mentorInfo={settings?.mentorInfo}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            className="h-9 gap-2 text-[11px] font-bold border-primary/20 hover:bg-primary/5 rounded-lg"
+          >
+            <DownloadIcon size={14} /> Export CSV
+          </Button>
+          <ManualEntryDialog onAdd={handleManualAdd} />
+        </div>
       </div>
 
       <AttendanceHero
         isClockedIn={isClockedIn}
         isPaused={isPaused}
         onToggle={toggleClock}
+        onFinalize={handleFinalize}
         onPause={handlePause}
         onResume={handleResume}
         startTime={activeEntry?.clockIn}
@@ -180,6 +281,17 @@ export default function AttendancePage() {
         entries={sessionData}
         onDelete={handleDelete}
         isDeleting={deleteSession.isPending}
+      />
+
+      <TimeSplitterDialog
+        open={splitterOpen}
+        onOpenChange={(v) => {
+          if (!isUpdating) setSplitterOpen(v)
+        }}
+        sessionDurationHours={pendingSession?.durationHours ?? 0}
+        practiceFields={practiceFields}
+        onSave={handleSplitterSave}
+        isSaving={isUpdating}
       />
     </div>
   )

@@ -20,6 +20,7 @@ import {
   LayoutDashboardIcon,
   Settings2Icon,
   TimerIcon,
+  CalendarDaysIcon,
 } from "lucide-react"
 
 const navData = {
@@ -29,11 +30,15 @@ const navData = {
       url: "/clients/dashboard",
       icon: <LayoutDashboardIcon />,
     },
-
     {
       title: "Attendance",
       url: "/clients/attendance",
       icon: <TimerIcon />,
+    },
+    {
+      title: "Calendar",
+      url: "/clients/calendar",
+      icon: <CalendarDaysIcon />,
     },
   ],
 

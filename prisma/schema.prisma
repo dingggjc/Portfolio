@@ -504,6 +504,8 @@ model attendance_sessions {
   clockOut   DateTime? @default(now()) @db.Timestamptz(6)
   break      Int?      @default(0)
   status     String?   @default("'ACTIVE'")
+  splits     Json?
+  notes      String?
   created_at DateTime  @default(now()) @db.Timestamptz(6)
   users      users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -515,6 +517,9 @@ model attendance_settings {
   userId         String    @id @db.Uuid
   goalHours      Float?    @default(0)
   initialBalance Float?    @default(0)
+  practiceFields Json?
+  mentorInfo     Json?
+  targetDate     DateTime? @db.Date
   created_at     DateTime  @default(now()) @db.Timestamptz(6)
   lastUpdated    DateTime? @default(now()) @db.Timestamptz(6)
   users          users     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)

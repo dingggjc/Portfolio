@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\JC\\\\Portfolio\\\\Frontend-Portfolio\" -Recurse -Directory -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -First 30)",
+      "Bash(Format-Table FullName)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ]
+}

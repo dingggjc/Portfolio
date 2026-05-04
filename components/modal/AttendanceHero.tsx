@@ -28,6 +28,7 @@ interface AttendanceHeroProps {
   isClockedIn: boolean
   isPaused: boolean
   onToggle: () => void
+  onFinalize: () => void
   onPause: () => void
   onResume: () => void
   startTime?: string
@@ -67,26 +68,27 @@ function Timer({ startTimeISO, totalPausedSeconds, isPaused }: { startTimeISO: s
   return <span className={`font-mono tabular-nums font-black tracking-tighter ${isPaused ? "text-muted-foreground/40" : "text-primary transition-all duration-300"}`}>{elapsed}</span>
 }
 
-export function AttendanceHero({ 
-  isClockedIn, 
+export function AttendanceHero({
+  isClockedIn,
   isPaused,
-  onToggle, 
+  onToggle,
+  onFinalize,
   onPause,
   onResume,
   startTime,
   totalPausedSeconds,
-  totalHours, 
-  remainingHours, 
-  todayHours, 
-  totalDays, 
-  progress, 
+  totalHours,
+  remainingHours,
+  todayHours,
+  totalDays,
+  progress,
   targetHours,
-  isSubmitting
+  isSubmitting,
 }: AttendanceHeroProps) {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const handleFinalize = () => {
-    onToggle()
+    onFinalize()
     setConfirmOpen(false)
   }
 

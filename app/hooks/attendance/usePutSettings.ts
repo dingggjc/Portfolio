@@ -5,7 +5,13 @@ export function usePutSettings() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: { goalHours: number; initialBalance: number }) => {
+    mutationFn: async (data: {
+      goalHours: number
+      initialBalance: number
+      practiceFields?: object
+      mentorInfo?: object
+      targetDate?: string | null
+    }) => {
       try {
         const res = await fetch("/api/attendance-settings", {
           method: "PUT",

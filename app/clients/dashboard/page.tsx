@@ -1,75 +1,98 @@
 "use client"
 
 import { SectionCards } from "@/components/section-cards"
-import { Card, CardContent } from "@/components/ui/card"
-import { MapPinIcon, SunIcon } from "lucide-react"
+import { DailyHoursChart } from "@/components/charts/DailyHoursChart"
+import { CumulativeProgressChart } from "@/components/charts/CumulativeProgressChart"
+import { FieldDistributionChart } from "@/components/charts/FieldDistributionChart"
+import { FieldProgressBars } from "@/components/charts/FieldProgressBars"
+import { CompletionETA } from "@/components/dashboard/CompletionETA"
 import { useGetSession } from "@/app/hooks/attendance/useGetSession"
 import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
+import { DEFAULT_PRACTICE_FIELDS } from "@/lib/attendance-constants"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Page() {
-  const { data: sessions, isLoading: sessionsLoading, error: sessionsError } = useGetSession()
-  const { data: settings, isLoading: settingsLoading, error: settingsError } = useGetSettings()
+  const { data: sessions = [], isLoading: sessionsLoading } = useGetSession()
+  const { data: settings, isLoading: settingsLoading } = useGetSettings()
 
   const isLoading = sessionsLoading || settingsLoading
-  const hasError = sessionsError || settingsError
+  const practiceFields = settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS
+  const goalHours = settings?.goalHours ?? 0
+  const initialBalance = settings?.initialBalance ?? 0
+  const targetDate = settings?.targetDate ?? null
 
-  if (hasError) {
-    console.error('Dashboard data fetch error:', { sessionsError, settingsError })
-  }
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
-      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="mb-2 flex items-center justify-between px-4 lg:px-6">
-          <div>
-            <h1 className="text-2xl font-black tracking-tight @[450px]/main:text-3xl">
-              Dashboard
-            </h1>
-            <p className="text-xs font-medium text-muted-foreground italic opacity-70">
-              Welcome back! Keep tracking your progress.
-            </p>
+      <div className="flex flex-col gap-6 py-4 md:py-6">
+
+        {/* Header */}
+        <div className="px-4 lg:px-6">
+          <h1 className="text-3xl font-black tracking-tighter">Dashboard</h1>
+          <p className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase opacity-70 mt-0.5">
+            Training overview • OJT progress
+          </p>
+        </div>
+
+        {/* Stat cards */}
+        <SectionCards sessions={sessions} settings={settings} isLoading={isLoading} />
+
+        {/* ETA & pace */}
+        <div className="px-4 lg:px-6">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+            </div>
+          ) : (
+            <CompletionETA
+              sessions={sessions}
+              goalHours={goalHours}
+              initialBalance={initialBalance}
+              targetDate={targetDate}
+            />
+          )}
+        </div>
+
+        {/* Charts row 1: Daily hours + Field distribution */}
+        <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            {isLoading ? <ChartSkeleton /> : <DailyHoursChart sessions={sessions} />}
+          </div>
+          <div className="lg:col-span-1">
+            {isLoading ? <ChartSkeleton /> : (
+              <FieldDistributionChart sessions={sessions} practiceFields={practiceFields} />
+            )}
           </div>
         </div>
 
-        <SectionCards 
-          sessions={sessions || []} 
-          settings={settings} 
-          isLoading={isLoading}
-        />
-
-        <div className="px-4 lg:px-6">
-          <Card className="overflow-hidden border-none bg-linear-to-r from-primary/10 via-background to-primary/5 shadow-md ring-1 ring-primary/20">
-            <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-6">
-              <div className="flex items-center gap-4 sm:gap-6">
-                <div className="flex size-12 sm:size-14 items-center justify-center rounded-2xl bg-primary/20 text-primary shadow-inner">
-                  <SunIcon className="size-6 sm:size-8 animate-pulse" />
-                </div>
-                <div className="text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-start gap-2 text-muted-foreground">
-                    <MapPinIcon size={14} />
-                    <span className="text-[10px] font-black tracking-widest uppercase opacity-70">
-                      Manila, Philippines
-                    </span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-black tabular-nums">
-                    32°C
-                    <span className="ml-1 text-sm sm:text-lg font-medium text-muted-foreground italic block sm:inline">
-                      Sunny
-                    </span>
-                  </h2>
-                </div>
-              </div>
-              <div className="hidden sm:block border-l border-primary/10 pl-6 sm:pl-8">
-                <p className="text-sm leading-tight font-bold text-primary">
-                  High of 34°C Expected
-                </p>
-                <p className="mt-0.5 text-xs font-medium text-muted-foreground italic opacity-80">
-                  Currently tracking real-time training conditions.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Charts row 2: Cumulative progress + Field progress bars */}
+        <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            {isLoading ? <ChartSkeleton tall /> : (
+              <CumulativeProgressChart
+                sessions={sessions}
+                goalHours={goalHours}
+                initialBalance={initialBalance}
+              />
+            )}
+          </div>
+          <div className="lg:col-span-1">
+            {isLoading ? <ChartSkeleton tall /> : (
+              <FieldProgressBars sessions={sessions} practiceFields={practiceFields} />
+            )}
+          </div>
         </div>
+
       </div>
+    </div>
+  )
+}
+
+function ChartSkeleton({ tall = false }: { tall?: boolean }) {
+  return (
+    <div className={`rounded-xl border border-primary/10 shadow-md p-5 space-y-3 ${tall ? "h-[300px]" : "h-[268px]"}`}>
+      <Skeleton className="h-4 w-32" />
+      <Skeleton className="h-3 w-48" />
+      <Skeleton className={`w-full rounded-lg ${tall ? "h-[220px]" : "h-[170px]"}`} />
     </div>
   )
 }
