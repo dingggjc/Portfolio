@@ -81,7 +81,7 @@ export default function SettingsPage() {
 
   if (isError) {
     return (
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 p-6 lg:p-8">
+      <div className="flex w-full flex-1 flex-col gap-8 px-4 lg:px-6 py-4 md:py-6">
         <ErrorDisplay title="Error loading settings" description="Failed to load settings." onRetry={refetch} />
       </div>
     )
@@ -89,7 +89,7 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 p-6 lg:p-8">
+      <div className="flex w-full flex-1 flex-col gap-8 px-4 lg:px-6 py-4 md:py-6">
         <Skeleton className="h-9 w-48" />
         {[1, 2, 3].map((i) => (
           <Card key={i} className="border-primary/10">
@@ -105,7 +105,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 p-6 lg:p-8">
+    <div className="flex w-full flex-1 flex-col gap-8 px-4 lg:px-6 py-4 md:py-6">
       <div className="space-y-1">
         <h1 className="text-3xl font-black tracking-tighter">Settings</h1>
         <p className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase opacity-70">

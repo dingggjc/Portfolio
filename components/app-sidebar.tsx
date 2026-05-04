@@ -16,11 +16,11 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import {
+  CalendarDaysIcon,
   Fan,
   LayoutDashboardIcon,
   Settings2Icon,
   TimerIcon,
-  CalendarDaysIcon,
 } from "lucide-react"
 
 const navData = {
@@ -71,7 +71,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <Fan className="size-5!" />
-                <span className="text-base font-semibold">JC | Portfolio</span>
+                <span className="text-base font-semibold">
+                  Json | Portfolio
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

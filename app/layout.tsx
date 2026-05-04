@@ -15,8 +15,8 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata = {
-  title: "JC | Portfolio",
-  description: "Frontend portfolio of JC",
+  title: "Json | Portfolio",
+  description: "Frontend portfolio of Json",
 }
 
 export default function RootLayout({

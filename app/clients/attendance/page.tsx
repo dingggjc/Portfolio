@@ -229,7 +229,7 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 p-6 lg:p-8">
+    <div className="flex w-full flex-1 flex-col gap-8 px-4 lg:px-6 py-4 md:py-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-black tracking-tighter">
@@ -299,7 +299,7 @@ export default function AttendancePage() {
 
 function AttendancePageSkeleton() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 p-6 lg:p-8">
+    <div className="flex w-full flex-1 flex-col gap-8 px-4 lg:px-6 py-4 md:py-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
           <div className="h-8 w-48 animate-pulse rounded bg-muted"></div>

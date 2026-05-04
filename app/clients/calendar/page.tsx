@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useGetSession } from "@/app/hooks/attendance/useGetSession"
+import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
+import { DEFAULT_PRACTICE_FIELDS } from "@/lib/attendance-constants"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Session {
@@ -54,6 +56,14 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<Date | null>(null)
   const { data: sessions = [], isLoading } = useGetSession()
+  const { data: settings } = useGetSettings()
+
+  const fieldMap = useMemo(() => {
+    const fields = settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS
+    const map: Record<string, string> = {}
+    for (const f of fields) map[f.id] = f.description.split(",")[0].trim()
+    return map
+  }, [settings])
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth))
@@ -80,7 +90,7 @@ export default function CalendarPage() {
   }, [currentMonth, sessions])
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-6 lg:p-8">
+    <div className="flex w-full flex-1 flex-col gap-6 px-4 lg:px-6 py-4 md:py-6">
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-3xl font-black tracking-tighter">Calendar</h1>
@@ -266,13 +276,23 @@ export default function CalendarPage() {
                     )}
 
                     {s.splits && Object.keys(s.splits).length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1 border-t border-primary/5">
+                      <div className="pt-2 border-t border-primary/5 space-y-1.5">
                         {Object.entries(s.splits)
-                          .filter(([, v]) => v > 0)
+                          .filter(([, v]) => Number(v) > 0)
                           .map(([k, v]) => (
-                            <span key={k} className="text-[9px] font-black bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                              {k}: {(v as number).toFixed(1)}h
-                            </span>
+                            <div key={k} className="flex items-start justify-between gap-2">
+                              <div className="flex items-start gap-1.5 min-w-0">
+                                <span className="flex-shrink-0 mt-0.5 size-4 rounded-full bg-primary/10 flex items-center justify-center text-[8px] font-black text-primary">
+                                  {k}
+                                </span>
+                                <span className="text-[10px] font-medium text-muted-foreground/70 leading-tight">
+                                  {fieldMap[k] ?? k}
+                                </span>
+                              </div>
+                              <span className="flex-shrink-0 text-[11px] font-black text-primary tabular-nums">
+                                {Number(v).toFixed(1)}h
+                              </span>
+                            </div>
                           ))}
                       </div>
                     )}

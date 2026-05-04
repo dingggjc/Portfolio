@@ -19,15 +19,16 @@ export function useUpdateProfile() {
         throw new Error("User not authenticated")
       }
 
+      const payload: Record<string, string | undefined> = {
+        id: user.id,
+        first_name: data.first_name ?? user.email?.split("@")[0] ?? "User",
+        last_name: data.last_name,
+        avatar_url: data.avatar_url,
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          first_name: data.first_name,
-          last_name: data.last_name,
-          avatar_url: data.avatar_url,
-          lastUpdated: new Date().toISOString()
-        })
-        .eq('id', user.id)
+        .upsert(payload, { onConflict: 'id' })
 
       if (error) {
         throw new Error(error.message)

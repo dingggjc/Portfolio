@@ -40,7 +40,7 @@ export default function MainNavbar() {
   ]
   return (
     <Navbar
-      name="JC | Portfolio"
+      name="Json | Portfolio"
       homeUrl="/"
       customNavigation={desktopNavigation}
       mobileLinks={mobileLinks}

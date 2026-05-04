@@ -17,7 +17,7 @@ export function useUserProfile() {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
 
       if (profile) {
         return {
