@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ShuffleIcon, SaveIcon, SkipForwardIcon, ClockIcon, NotebookPenIcon } from "lucide-react"
+import { ShuffleIcon, SaveIcon, SkipForwardIcon, ClockIcon, NotebookPenIcon, AlertTriangleIcon } from "lucide-react"
 import { PracticeField } from "@/lib/attendance-constants"
 
 interface TimeSplitterDialogProps {
@@ -23,6 +23,7 @@ interface TimeSplitterDialogProps {
   practiceFields: PracticeField[]
   onSave: (splits: Record<string, number> | null, notes: string | null) => void
   isSaving: boolean
+  overdueWarning?: boolean
 }
 
 export function TimeSplitterDialog({
@@ -32,6 +33,7 @@ export function TimeSplitterDialog({
   practiceFields,
   onSave,
   isSaving,
+  overdueWarning = false,
 }: TimeSplitterDialogProps) {
   const [splits, setSplits] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState("")
@@ -99,6 +101,18 @@ export function TimeSplitterDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {overdueWarning && (
+          <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-500/20 dark:bg-amber-500/10">
+            <AlertTriangleIcon size={15} className="shrink-0 text-amber-500 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Session exceeded your goal hours</p>
+              <p className="text-[11px] font-medium text-amber-600/80 dark:text-amber-400/70">
+                Your session was still running when you came back. We've auto-finalized it now — review the duration and save.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Session summary */}
         <div className="bg-muted/50 rounded-xl p-4 border border-primary/5 space-y-3">
           <div className="flex items-center justify-between text-[11px] font-bold text-muted-foreground/80">
@@ -107,20 +121,24 @@ export function TimeSplitterDialog({
               {sessionDurationHours.toFixed(2)}h
             </span>
           </div>
-          <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className={`h-full transition-all duration-300 rounded-full ${isOver ? "bg-amber-400" : "bg-primary"}`}
-              style={{ width: `${allocationPct}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between text-[10px] font-semibold text-muted-foreground/60">
-            <span>Allocated: {totalAllocated.toFixed(2)}h</span>
-            <span className={isOver ? "text-amber-500 font-bold" : ""}>
-              {isOver
-                ? `Note: ${(totalAllocated - sessionDurationHours).toFixed(2)}h over session`
-                : `Remaining: ${remaining.toFixed(2)}h`}
-            </span>
-          </div>
+          {practiceFields.length > 0 && (
+            <>
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-300 rounded-full ${isOver ? "bg-amber-400" : "bg-primary"}`}
+                  style={{ width: `${allocationPct}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-semibold text-muted-foreground/60">
+                <span>Allocated: {totalAllocated.toFixed(2)}h</span>
+                <span className={isOver ? "text-amber-500 font-bold" : ""}>
+                  {isOver
+                    ? `Note: ${(totalAllocated - sessionDurationHours).toFixed(2)}h over session`
+                    : `Remaining: ${remaining.toFixed(2)}h`}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Notes */}
@@ -137,87 +155,103 @@ export function TimeSplitterDialog({
           />
         </div>
 
-        {/* Auto-distribute */}
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleAutoDistribute}
-            className="h-8 text-[11px] font-bold gap-1.5 border-primary/20 hover:bg-primary/5"
-          >
-            <ShuffleIcon size={12} /> Auto-distribute by %
-          </Button>
-        </div>
-
-        {/* Fields */}
-        <div className="space-y-2">
-          {practiceFields.map((field) => (
-            <div
-              key={field.id}
-              className="flex items-center gap-3 rounded-xl border border-primary/5 bg-muted/20 px-4 py-3"
-            >
-              <div className="flex-shrink-0 size-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-[11px] font-black text-primary">
-                  {field.id}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold text-foreground line-clamp-2 leading-snug">
-                  {field.description}
-                </p>
-                <p className="text-[9px] font-semibold text-muted-foreground/50 mt-0.5">
-                  {field.percentage}% max · min {field.minHours}h
-                </p>
-              </div>
-              <div className="flex-shrink-0 w-20">
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={splits[field.id] ?? ""}
-                  onChange={(e) =>
-                    setSplits((prev) => ({
-                      ...prev,
-                      [field.id]: e.target.value,
-                    }))
-                  }
-                  placeholder="0.00"
-                  className="h-8 text-[12px] font-bold text-right border-primary/15 focus-visible:ring-primary rounded-lg"
-                />
-              </div>
-              <span className="text-[10px] font-semibold text-muted-foreground/50 w-3">
-                h
-              </span>
+        {practiceFields.length > 0 ? (
+          <>
+            {/* Auto-distribute */}
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAutoDistribute}
+                className="h-8 text-[11px] font-bold gap-1.5 border-primary/20 hover:bg-primary/5"
+              >
+                <ShuffleIcon size={12} /> Auto-distribute by %
+              </Button>
             </div>
-          ))}
-        </div>
 
-        <DialogFooter className="gap-2 sm:gap-2 pt-2">
-          <Button
-            variant="ghost"
-            onClick={handleSkip}
-            disabled={isSaving}
-            className="text-[11px] font-bold gap-1.5"
-          >
-            <SkipForwardIcon size={12} /> Skip allocation
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-primary hover:bg-primary/90 text-white text-[11px] font-bold gap-1.5 rounded-lg px-5"
-          >
-            {isSaving ? (
-              <>
-                <div className="h-3 w-3 animate-spin rounded-full border border-white border-t-transparent" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <SaveIcon size={12} /> Save with splits
-              </>
-            )}
-          </Button>
-        </DialogFooter>
+            {/* Fields */}
+            <div className="space-y-2">
+              {practiceFields.map((field) => (
+                <div
+                  key={field.id}
+                  className="flex items-center gap-3 rounded-xl border border-primary/5 bg-muted/20 px-4 py-3"
+                >
+                  <div className="flex-shrink-0 size-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-[11px] font-black text-primary">{field.id}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-bold text-foreground line-clamp-2 leading-snug">
+                      {field.description}
+                    </p>
+                    <p className="text-[9px] font-semibold text-muted-foreground/50 mt-0.5">
+                      {field.percentage}% max · min {field.minHours}h
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 w-20">
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={splits[field.id] ?? ""}
+                      onChange={(e) =>
+                        setSplits((prev) => ({ ...prev, [field.id]: e.target.value }))
+                      }
+                      placeholder="0.00"
+                      className="h-8 text-[12px] font-bold text-right border-primary/15 focus-visible:ring-primary rounded-lg"
+                    />
+                  </div>
+                  <span className="text-[10px] font-semibold text-muted-foreground/50 w-3">h</span>
+                </div>
+              ))}
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-2 pt-2">
+              <Button
+                variant="ghost"
+                onClick={handleSkip}
+                disabled={isSaving}
+                className="text-[11px] font-bold gap-1.5"
+              >
+                <SkipForwardIcon size={12} /> Skip allocation
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-primary hover:bg-primary/90 text-white text-[11px] font-bold gap-1.5 rounded-lg px-5"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="h-3 w-3 animate-spin rounded-full border border-white border-t-transparent" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <SaveIcon size={12} /> Save with splits
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <DialogFooter className="gap-2 sm:gap-2 pt-2">
+            <Button
+              onClick={handleSkip}
+              disabled={isSaving}
+              className="bg-primary hover:bg-primary/90 text-white text-[11px] font-bold gap-1.5 rounded-lg px-5"
+            >
+              {isSaving ? (
+                <>
+                  <div className="h-3 w-3 animate-spin rounded-full border border-white border-t-transparent" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <SaveIcon size={12} /> Save session
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   )

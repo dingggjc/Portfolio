@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DEFAULT_PRACTICE_FIELDS, PracticeField } from "@/lib/attendance-constants"
+import { PracticeField } from "@/lib/attendance-constants"
 import { ListChecksIcon, CheckCircle2Icon } from "lucide-react"
 
 interface Session {
@@ -17,7 +17,7 @@ export function FieldProgressBars({
   sessions: Session[]
   practiceFields?: PracticeField[]
 }) {
-  const fields = practiceFields?.length ? practiceFields : DEFAULT_PRACTICE_FIELDS
+  const fields = practiceFields ?? []
 
   const totals = useMemo(() => {
     const t: Record<string, number> = {}

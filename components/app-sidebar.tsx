@@ -22,6 +22,7 @@ import {
   Settings2Icon,
   TimerIcon,
   FileTextIcon,
+  TrendingUpIcon,
 } from "lucide-react"
 
 const navData = {
@@ -40,6 +41,11 @@ const navData = {
       title: "Calendar",
       url: "/clients/calendar",
       icon: <CalendarDaysIcon />,
+    },
+    {
+      title: "Goals & Progress",
+      url: "/clients/progress",
+      icon: <TrendingUpIcon />,
     },
     {
       title: "DT Form 001",

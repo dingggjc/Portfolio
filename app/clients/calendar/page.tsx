@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useGetSession } from "@/app/hooks/attendance/useGetSession"
 import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
-import { DEFAULT_PRACTICE_FIELDS } from "@/lib/attendance-constants"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Session {
@@ -67,7 +66,7 @@ export default function CalendarPage() {
   const { data: settings } = useGetSettings()
 
   const fieldMap = useMemo(() => {
-    const fields = settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS
+    const fields = settings?.practiceFields ?? []
     const map: Record<string, string> = {}
     for (const f of fields) map[f.id] = f.description.split(",")[0].trim()
     return map

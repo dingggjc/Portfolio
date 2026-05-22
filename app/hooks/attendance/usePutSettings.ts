@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
 
 export function usePutSettings() {
   const queryClient = useQueryClient()
@@ -33,10 +32,6 @@ export function usePutSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendance-settings"] })
-      toast.success("Settings updated!")
-    },
-    onError: (error: Error) => {
-      toast.error(error.message)
     },
   })
 }

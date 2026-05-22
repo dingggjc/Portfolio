@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { FileTextIcon, PrinterIcon, CheckCircle2Icon, AlertCircleIcon } from "lucide-react"
-import { DEFAULT_PRACTICE_FIELDS, PracticeField } from "@/lib/attendance-constants"
+import { PracticeField } from "@/lib/attendance-constants"
 
 interface AttendanceEntry {
   id: string
@@ -45,7 +45,7 @@ export function DtFormReport({
   goalHours,
   mentorInfo,
 }: DtFormReportProps) {
-  const fields = practiceFields?.length ? practiceFields : DEFAULT_PRACTICE_FIELDS
+  const fields = practiceFields ?? []
 
   const aggregated = useMemo(() => {
     const totals: Record<string, number> = {}

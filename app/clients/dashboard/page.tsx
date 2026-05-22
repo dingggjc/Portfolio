@@ -10,7 +10,6 @@ import { WeeklyPaceCard } from "@/components/charts/WeeklyPaceCard"
 import { CompletionETA } from "@/components/dashboard/CompletionETA"
 import { useGetSession } from "@/app/hooks/attendance/useGetSession"
 import { useGetSettings } from "@/app/hooks/attendance/useGetSettings"
-import { DEFAULT_PRACTICE_FIELDS } from "@/lib/attendance-constants"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Page() {
@@ -18,7 +17,7 @@ export default function Page() {
   const { data: settings, isLoading: settingsLoading } = useGetSettings()
 
   const isLoading = sessionsLoading || settingsLoading
-  const practiceFields = settings?.practiceFields ?? DEFAULT_PRACTICE_FIELDS
+  const practiceFields = settings?.practiceFields ?? []
   const goalHours = settings?.goalHours ?? 0
   const initialBalance = settings?.initialBalance ?? 0
   const targetDate = settings?.targetDate ?? null

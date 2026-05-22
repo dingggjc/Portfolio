@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { DEFAULT_PRACTICE_FIELDS, PracticeField } from "@/lib/attendance-constants"
+import { PracticeField } from "@/lib/attendance-constants"
 import { PieChartIcon } from "lucide-react"
 
 interface Session {
@@ -39,7 +39,7 @@ export function FieldDistributionChart({
   sessions: Session[]
   practiceFields?: PracticeField[]
 }) {
-  const fields = practiceFields?.length ? practiceFields : DEFAULT_PRACTICE_FIELDS
+  const fields = practiceFields ?? []
 
   const { chartData, chartConfig, totalSplit } = useMemo(() => {
     const totals: Record<string, number> = {}
