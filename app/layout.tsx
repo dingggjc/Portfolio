@@ -1,13 +1,12 @@
-import { Geist_Mono, Inter } from "next/font/google"
+import { Geist_Mono, Outfit } from "next/font/google"
 
-import TanstackProvider from "@/components/layout/TanstackProvider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { Toaster } from "sonner"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -32,11 +31,10 @@ export default function RootLayout({
         "antialiased",
         fontMono.variable,
         "font-sans",
-        inter.variable
+        outfit.variable
       )}
     >
       <body>
-        <TanstackProvider>
           <TooltipProvider>
             <ThemeProvider>
               {children}
@@ -58,7 +56,6 @@ export default function RootLayout({
               />
             </ThemeProvider>
           </TooltipProvider>
-        </TanstackProvider>
       </body>
     </html>
   )

@@ -1,88 +1,52 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-
-import { Mail, Phone } from "lucide-react"
+import { motion, useReducedMotion } from "motion/react"
 
 interface ContactMeProps {
-  title?: string
-  description?: string
-  emailLabel?: string
-  emailDescription?: string
   email?: string
-  phoneLabel?: string
-  phoneDescription?: string
   phone?: string
   className?: string
 }
 
-import { motion } from "motion/react"
-
 const ContactMe = ({
-  title = "Get in Touch",
-  description = "I'm currently open to new opportunities. Feel free to reach out via email or phone.",
-  emailLabel = "Email",
-  emailDescription = "The best way to reach me for professional inquiries.",
   email = "charlesaciertojc@gmail.com",
-  phoneLabel = "Phone",
-  phoneDescription = "Available for calls or messages.",
   phone = "09264648501",
   className,
 }: ContactMeProps) => {
+  const reduce = useReducedMotion()
+
   return (
     <section
       id="contact"
-      className={cn(
-        "flex min-h-screen items-center justify-center px-4 py-20",
-        className
-      )}
+      className={cn("px-4 py-32", className)}
     >
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={reduce ? false : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        className="mx-auto w-full max-w-6xl"
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto max-w-2xl text-center"
       >
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <div className="flex flex-col space-y-4 pt-10 md:pt-16 lg:pt-24 lg:pr-10">
-            <p className="text-sm font-semibold tracking-widest text-primary uppercase">
-              Contact
-            </p>
-            <h2 className="text-4xl font-bold tracking-tight">{title}</h2>
-            <p className="max-w-xl text-lg text-muted-foreground">
-              {description}
-            </p>
-          </div>
-
-          <div className="grid gap-4">
-            <div className="rounded-xl border border-border/40 bg-muted/50 p-8 shadow-sm">
-              <Mail className="mb-4 h-5 w-5 text-muted-foreground hover:text-primary" />
-              <p className="mb-1 font-medium">{emailLabel}</p>
-              <p className="mb-4 text-sm text-muted-foreground">
-                {emailDescription}
-              </p>
-              <a
-                href={`mailto:${email}`}
-                className="font-semibold text-primary hover:underline"
-              >
-                {email}
-              </a>
-            </div>
-
-            <div className="rounded-xl border border-border/40 bg-muted/50 p-8 shadow-sm">
-              <Phone className="mb-4 h-5 w-5 text-muted-foreground hover:text-primary" />
-              <p className="mb-1 font-medium">{phoneLabel}</p>
-              <p className="mb-4 text-sm text-muted-foreground">
-                {phoneDescription}
-              </p>
-              <a
-                href={`tel:${phone}`}
-                className="font-semibold text-primary hover:underline"
-              >
-                {phone}
-              </a>
-            </div>
-          </div>
+        <h2 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl">
+          Let's talk
+        </h2>
+        <p className="mb-10 text-base text-muted-foreground">
+          Open to new opportunities. Reach out directly.
+        </p>
+        <div className="space-y-3">
+          <a
+            href={`mailto:${email}`}
+            className="block text-xl font-semibold text-primary underline-offset-4 transition-colors hover:underline md:text-2xl"
+          >
+            {email}
+          </a>
+          <a
+            href={`tel:${phone}`}
+            className="block text-base text-muted-foreground transition-colors hover:text-foreground"
+          >
+            +63 {phone.slice(1, 4)} {phone.slice(4, 7)} {phone.slice(7)}
+          </a>
         </div>
       </motion.div>
     </section>

@@ -1,122 +1,200 @@
 "use client"
 
 import { GitHubLogoIcon } from "@radix-ui/react-icons"
-import { Globe2Icon, Mail } from "lucide-react"
-import { animate, motion } from "motion/react"
-import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { Mail } from "lucide-react"
+import { animate, motion, useReducedMotion } from "motion/react"
 import { InteractiveHoverButton } from "../ui/interactive-hover-button"
 
+function smoothScrollTo(id: string) {
+  const target = document.getElementById(id)
+  if (!target) return
+  const pos = target.getBoundingClientRect().top + window.scrollY - 84
+  window.dispatchEvent(new Event("scroll-start"))
+  animate(window.scrollY, pos, {
+    duration: 0.6,
+    ease: [0.22, 1, 0.36, 1],
+    onUpdate: (v: number) => window.scrollTo(0, v),
+    onComplete: () => window.dispatchEvent(new Event("scroll-end")),
+  })
+}
+
+const ease = [0.16, 1, 0.3, 1] as [number, number, number, number]
+
 export default function Hero() {
+  const reduce = useReducedMotion()
+
+  function anim(delay: number) {
+    if (reduce) return {}
+    return {
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.65, delay, ease },
+    }
+  }
+
   return (
     <section
       id="hero"
-      className="flex min-h-screen items-center justify-center px-4 py-20"
+      className="relative flex min-h-dvh items-center overflow-hidden px-4 pt-20 pb-16"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        className="mx-auto max-w-5xl text-center"
-      >
-        <div className="px-auto py-auto mb-4 flex justify-center">
-          <Avatar className="size-20">
-            <AvatarImage
-              alt="@myusername"
-              src="/assets/jpeg/formaledited.JPG"
-            />
-            <AvatarFallback className="text-xl">JC</AvatarFallback>
-          </Avatar>
+      {/* Ambient glow - upper right */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 50% 40% at 85% 15%, oklch(0.6171 0.1375 39.0427 / 0.09) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="flex flex-col gap-14 lg:flex-row lg:items-center lg:justify-between">
+
+          {/* Left: prose */}
+          <div className="flex-1">
+            {/* Availability - mobile only; desktop shows in profile card */}
+            <motion.div {...anim(0)} className="mb-8 lg:hidden">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="font-mono text-xs text-muted-foreground">
+                  Available for work
+                </span>
+              </span>
+            </motion.div>
+
+            {/* Name */}
+            <h1 className="mb-6 select-none">
+              <motion.span
+                {...anim(0.05)}
+                className="block text-5xl font-bold leading-[0.92] tracking-tight md:text-7xl lg:text-8xl"
+              >
+                Charles
+              </motion.span>
+              <motion.span
+                {...anim(0.13)}
+                className="block text-5xl font-bold leading-[0.92] tracking-tight text-primary md:text-7xl lg:text-8xl"
+              >
+                Acierto
+              </motion.span>
+            </h1>
+
+            {/* Role with amber accent line */}
+            <motion.div {...anim(0.21)} className="mb-5 flex items-center gap-3">
+              <div className="h-px w-8 shrink-0 bg-primary/50" />
+              <p className="font-mono text-sm tracking-wide text-muted-foreground">
+                Web Developer / React · Next.js · C# .NET
+              </p>
+            </motion.div>
+
+            {/* Bio */}
+            <motion.p
+              {...anim(0.29)}
+              className="mb-10 max-w-[44ch] text-base leading-relaxed text-muted-foreground"
+            >
+              Bridging clean React interfaces with robust .NET backends. Currently
+              building at Repoint Solutions.
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              {...anim(0.37)}
+              className="flex flex-wrap items-center gap-4"
+            >
+              <InteractiveHoverButton
+                rounded="sm"
+                showIcons={false}
+                onClick={() => smoothScrollTo("projects")}
+              >
+                View Work
+              </InteractiveHoverButton>
+
+              <a
+                href="/others/Resume.pdf"
+                download
+                className="inline-flex h-10 items-center rounded-sm border border-border px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+              >
+                Download CV
+              </a>
+
+              <div className="flex items-center gap-4 border-l border-border pl-4">
+                <a
+                  href="https://github.com/dingggjc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <GitHubLogoIcon className="h-5 w-5" />
+                </a>
+                <a
+                  href="mailto:charlesaciertojc@gmail.com"
+                  aria-label="Email"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Mail className="h-5 w-5" />
+                </a>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right: profile card - desktop only */}
+          <motion.aside
+            initial={reduce ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden shrink-0 lg:block"
+          >
+            <div className="w-[252px] rounded-xl border border-border/40 bg-muted/50 p-6">
+              <ul className="divide-y divide-border/40">
+                <li className="flex flex-col gap-1 pb-4">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
+                    Status
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                    <span className="text-sm font-medium text-primary">
+                      Available for work
+                    </span>
+                  </span>
+                </li>
+                <li className="flex flex-col gap-1 py-4">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
+                    Experience
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    8+ months professional
+                  </span>
+                </li>
+                <li className="flex flex-col gap-1 py-4">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
+                    Stack
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    React · Next.js · C# .NET
+                  </span>
+                </li>
+                <li className="flex flex-col gap-1 py-4">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
+                    Location
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    Philippines
+                  </span>
+                </li>
+                <li className="flex flex-col gap-1 pt-4">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
+                    Type
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    Full-time · Remote
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </motion.aside>
+
         </div>
-
-        <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl">
-          Hi, I&apos;m Charles
-        </h1>
-
-        <h2 className="mb-8 text-2xl font-medium text-muted-foreground md:text-3xl">
-          Web Developer
-        </h2>
-
-        <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          Versatile Developer with professional experience building
-          high-performance web and mobile applications. Specializing in the
-          React ecosystem (Next.js, React Native) and backend integration with
-          C#/.NET. I focus on creating scalable, user-centric solutions by
-          bridging the gap between elegant frontend design and robust backend
-          logic. Proven ability to adapt quickly to new technologies and deliver
-          production-ready code in fast-paced environments
-        </p>
-
-        <div className="mb-10 flex justify-center gap-4">
-          <InteractiveHoverButton
-            rounded="sm"
-            showIcons={false}
-            onClick={() => {
-              const target = document.getElementById("projects")
-              if (target) {
-                window.dispatchEvent(new Event("scroll-start"))
-                const navbarHeight = 84
-                const targetPosition =
-                  target.getBoundingClientRect().top +
-                  window.scrollY -
-                  navbarHeight
-                animate(window.scrollY, targetPosition, {
-                  duration: 0.6,
-                  ease: [0.22, 1, 0.36, 1],
-                  onUpdate: (latest: number) => window.scrollTo(0, latest),
-                  onComplete: () => {
-                    window.dispatchEvent(new Event("scroll-end"))
-                  },
-                })
-              }
-            }}
-          >
-            View my work
-          </InteractiveHoverButton>
-          <InteractiveHoverButton
-            rounded="sm"
-            showIcons={false}
-            onClick={() => {
-              const target = document.getElementById("contact")
-              if (target) {
-                const targetPosition =
-                  target.getBoundingClientRect().top + window.scrollY
-                animate(window.scrollY, targetPosition, {
-                  duration: 1.2,
-                  ease: [0.16, 1, 0.3, 1],
-                  onUpdate: (latest: number) => window.scrollTo(0, latest),
-                })
-              }
-            }}
-          >
-            Contact Me
-          </InteractiveHoverButton>
-        </div>
-
-        <div className="flex justify-center gap-5">
-          <a
-            href="https://github.com/dingggjc"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground transition-colors hover:text-primary"
-          >
-            <GitHubLogoIcon className="h-6 w-6" />
-          </a>
-          <a
-            href="mailto:charlesaciertojc@gmail.com"
-            className="text-muted-foreground transition-colors hover:text-primary"
-          >
-            <Mail className="h-6 w-6" />
-          </a>
-
-          <Link
-            href="/login"
-            className="text-muted-foreground transition-colors hover:text-primary"
-          >
-            <Globe2Icon className="h-6 w-6" />
-          </Link>
-        </div>
-      </motion.div>
+      </div>
     </section>
   )
 }

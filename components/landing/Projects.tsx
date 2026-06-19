@@ -2,6 +2,7 @@
 
 import { projects } from "@/data/project.data"
 import { GlobeIcon } from "@radix-ui/react-icons"
+import { motion, useReducedMotion } from "motion/react"
 import Image from "next/image"
 import { BentoCard, BentoGrid } from "../ui/bento-grid"
 
@@ -28,42 +29,33 @@ const features = projects.map((project) => ({
   ),
 }))
 
-import { motion } from "motion/react"
-
 export function Projects() {
+  const reduce = useReducedMotion()
+
   return (
-    <section
-      id="projects"
-      className="flex min-h-screen items-center justify-center px-4 py-20"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        className="mx-auto w-full max-w-5xl"
-      >
-        <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-semibold tracking-widest text-primary uppercase">
-            Featured Work
-          </p>
-
-          <h2 className="mb-4 text-4xl font-bold tracking-tight">
-            Projects I&apos;ve Contributed To
+    <section id="projects" className="px-4 py-24">
+      <div className="mx-auto w-full max-w-5xl">
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-12"
+        >
+          <h2 className="mb-3 text-4xl font-bold tracking-tight">
+            Selected Work
           </h2>
-
-          <p className="mx-auto max-w-xl text-lg text-muted-foreground">
-            Explore a selection of applications and platforms I&apos;ve helped
-            build, showcasing my focus on delivering elegant and scalable user
-            experiences.
+          <p className="max-w-xl text-base text-muted-foreground">
+            Applications and platforms I've helped build.
           </p>
-        </div>
+        </motion.div>
 
         <BentoGrid className="grid gap-6 md:grid-cols-2">
           {features.map((feature) => (
             <BentoCard key={feature.id} {...feature} />
           ))}
         </BentoGrid>
-      </motion.div>
+      </div>
     </section>
   )
 }

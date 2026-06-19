@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { motion } from "motion/react"
+import { motion, useReducedMotion } from "motion/react"
 import Image from "next/image"
 
 interface ExperienceItem {
@@ -12,16 +12,12 @@ interface ExperienceItem {
   logo: string
 }
 
-interface Experience1Props {
-  heading?: string
-  buttonText?: string
-  buttonUrl?: string
+interface ExperienceProps {
   experience?: ExperienceItem[]
   className?: string
 }
 
 const Experience = ({
-  heading = "Experience",
   experience = [
     {
       period: "8 Months",
@@ -33,7 +29,7 @@ const Experience = ({
     },
     {
       period: "2 Months",
-      title: "Pre-Employment Training (Frontend)",
+      title: "Pre-Employment Training",
       description:
         "Underwent intensive training focused on real-world frontend workflows, developing responsive interfaces, and strengthening software troubleshooting skills.",
       company: "Repoint Solutions",
@@ -49,64 +45,66 @@ const Experience = ({
     },
   ],
   className,
-}: Experience1Props) => {
+}: ExperienceProps) => {
+  const reduce = useReducedMotion()
+
   return (
     <section
       id="experience"
-      className={cn(
-        "flex min-h-screen items-center justify-center px-4 py-20",
-        className
-      )}
+      className={cn("px-4 py-24", className)}
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        className="mx-auto w-full max-w-6xl space-y-10 lg:space-y-12"
-      >
-        <div className="flex flex-col items-center text-center">
-          <p className="mb-3 text-sm font-semibold tracking-widest text-primary uppercase">
-            Career
-          </p>
-          <h2 className="mb-4 text-4xl font-bold tracking-tight">{heading}</h2>
-          <p className="mx-auto max-w-xl text-lg text-muted-foreground">
-            My professional journey in software development, highlighting key
-            roles, technical milestones, and the projects I&apos;ve helped
-            build.
-          </p>
-        </div>
+      <div className="mx-auto w-full max-w-6xl">
+        <motion.h2
+          initial={reduce ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-12 text-4xl font-bold tracking-tight"
+        >
+          Experience
+        </motion.h2>
 
-        <div className="rounded-xl border border-border/40 bg-muted/50 p-8 shadow-sm md:p-10 lg:p-12">
-          <ul>
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="rounded-xl border border-border/40 bg-muted/50 p-8 shadow-sm md:p-10 lg:p-12"
+        >
+          <ul className="divide-y divide-border/40">
             {experience.map((exp, index) => (
               <li
                 key={index}
-                className="flex flex-col justify-between border-b py-10 last:border-b-0 md:flex-row"
+                className="flex flex-col justify-between py-10 first:pt-0 last:pb-0 md:flex-row"
               >
-                <div className="max-w-lg text-xl tracking-tighter lg:w-1/3">
+                <div className="mb-2 max-w-lg font-mono text-sm tracking-wide text-muted-foreground md:mb-0 lg:w-1/4">
                   {exp.period}
                 </div>
-                <div className="lg:w-1/3">
-                  <h2 className="mb-4 text-2xl font-semibold tracking-tighter">
+                <div className="lg:w-5/12">
+                  <h3 className="mb-3 text-xl font-semibold tracking-tight">
                     {exp.title}
-                  </h2>
-                  <p className="text-foreground/50">{exp.description}</p>
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {exp.description}
+                  </p>
                 </div>
-                <div className="flex items-start justify-end gap-3 text-right lg:w-1/4">
+                <div className="mt-4 flex items-start gap-2 md:mt-0 md:justify-end lg:w-1/4">
                   <Image
                     src={exp.logo}
                     alt={exp.company}
-                    width={24}
-                    height={24}
-                    className="dark:invert"
+                    width={20}
+                    height={20}
+                    className="mt-0.5 rounded-sm dark:invert"
                   />
-                  {exp.company}
+                  <span className="text-sm text-muted-foreground">
+                    {exp.company}
+                  </span>
                 </div>
               </li>
             ))}
           </ul>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   )
 }
