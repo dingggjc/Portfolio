@@ -61,8 +61,8 @@ export default function MainNavbar() {
             />
 
             <Button asChild size="sm" variant="default" className="hidden md:inline-flex">
-              <a href="/others/Resume.pdf" download>
-                Download CV
+              <a href="/others/Resume.pdf" target="_blank" rel="noopener noreferrer">
+                View CV
               </a>
             </Button>
 
@@ -90,8 +90,8 @@ export default function MainNavbar() {
                     </button>
                   ))}
                   <Button asChild size="sm" className="mt-4 w-full">
-                    <a href="/others/Resume.pdf" download>
-                      Download CV
+                    <a href="/others/Resume.pdf" target="_blank" rel="noopener noreferrer">
+                      View CV
                     </a>
                   </Button>
                 </nav>

@@ -49,11 +49,8 @@ const Experience = ({
   const reduce = useReducedMotion()
 
   return (
-    <section
-      id="experience"
-      className={cn("px-4 py-24", className)}
-    >
-      <div className="mx-auto w-full max-w-6xl">
+    <section id="experience" className={cn("px-4 py-24", className)}>
+      <div className="mx-auto w-full max-w-5xl">
         <motion.h2
           initial={reduce ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -64,46 +61,71 @@ const Experience = ({
           Experience
         </motion.h2>
 
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-xl border border-border/40 bg-muted/50 p-8 shadow-sm md:p-10 lg:p-12"
-        >
-          <ul className="divide-y divide-border/40">
+        <div className="relative pl-6">
+          {/* Vertical timeline line */}
+          <div
+            aria-hidden
+            className="absolute left-0 top-2 bottom-4 w-px bg-border/60"
+          />
+
+          <ul className="space-y-0">
             {experience.map((exp, index) => (
-              <li
+              <motion.li
                 key={index}
-                className="flex flex-col justify-between py-10 first:pt-0 last:pb-0 md:flex-row"
+                initial={reduce ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="relative pb-10 last:pb-0"
               >
-                <div className="mb-2 max-w-lg font-mono text-sm tracking-wide text-muted-foreground md:mb-0 lg:w-1/4">
-                  {exp.period}
+                {/* Timeline dot */}
+                <div
+                  aria-hidden
+                  className="absolute -left-[25px] top-1.5 flex h-3 w-3 items-center justify-center rounded-full border border-primary/50 bg-background"
+                >
+                  <div className="h-1 w-1 rounded-full bg-primary/70" />
                 </div>
-                <div className="lg:w-5/12">
-                  <h3 className="mb-3 text-xl font-semibold tracking-tight">
-                    {exp.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {exp.description}
-                  </p>
+
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  {/* Period */}
+                  <div className="shrink-0 md:w-[120px]">
+                    <span className="font-mono text-xs tracking-wide text-muted-foreground">
+                      {exp.period}
+                    </span>
+                  </div>
+
+                  {/* Role + description */}
+                  <div className="flex-1">
+                    <h3 className="mb-2 text-lg font-semibold tracking-tight">
+                      {exp.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {exp.description}
+                    </p>
+                  </div>
+
+                  {/* Company */}
+                  <div className="flex shrink-0 items-center gap-2 md:w-[140px] md:justify-end">
+                    <Image
+                      src={exp.logo}
+                      alt={exp.company}
+                      width={16}
+                      height={16}
+                      className="rounded-sm dark:invert"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {exp.company}
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-4 flex items-start gap-2 md:mt-0 md:justify-end lg:w-1/4">
-                  <Image
-                    src={exp.logo}
-                    alt={exp.company}
-                    width={20}
-                    height={20}
-                    className="mt-0.5 rounded-sm dark:invert"
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    {exp.company}
-                  </span>
-                </div>
-              </li>
+              </motion.li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

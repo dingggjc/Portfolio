@@ -40,27 +40,31 @@ export default function Skills() {
           What I build with
         </motion.h2>
 
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+        <div className="space-y-5">
           {skillCategories.map((category, i) => (
             <motion.div
               key={category.title}
-              initial={reduce ? false : { opacity: 0, y: 16 }}
+              initial={reduce ? false : { opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{
                 duration: 0.5,
-                delay: i * 0.1,
+                delay: i * 0.08,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="border-l-2 border-primary/30 pl-5"
+              className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-8"
             >
-              <h3 className="mb-4 font-mono text-[11px] uppercase tracking-widest text-primary">
-                {category.title}
-              </h3>
-              <ul className="space-y-2">
+              <div className="w-20 shrink-0 pt-1">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                  {category.title}
+                </span>
+              </div>
+              <ul className="flex flex-wrap gap-2">
                 {category.skills.map((skill) => (
-                  <li key={skill} className="text-sm text-muted-foreground">
-                    {skill}
+                  <li key={skill}>
+                    <span className="inline-flex items-center rounded-md border border-border/70 bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/30 hover:bg-muted/60">
+                      {skill}
+                    </span>
                   </li>
                 ))}
               </ul>
