@@ -46,7 +46,7 @@ export function Projects() {
             Selected Work
           </h2>
           <p className="max-w-xl text-base text-muted-foreground">
-            Applications and platforms I've helped build.
+            Applications and platforms I've built, alone and with teams.
           </p>
         </motion.div>
 

@@ -7,7 +7,7 @@ import Image from "next/image"
 interface ExperienceItem {
   period: string
   title: string
-  description: string
+  bullets: string[]
   company: string
   logo: string
 }
@@ -20,26 +20,25 @@ interface ExperienceProps {
 const Experience = ({
   experience = [
     {
-      period: "8 Months",
-      title: "Software Developer",
-      description:
-        "Developed frontend features for enterprise-level applications using React and Next.js, while managing backend logic and MySQL database structures via C#/.NET.",
+      period: "2024 – Present",
+      title: "Full Stack Developer",
+      bullets: [
+        "Shipped features across four production applications spanning web and mobile: Helps Innovation (React/C#), Careerpoint (Next.js/C#), Neuropoint (React/C#), and Helps Emergency (React Native, published on Google Play).",
+        "Built frontend features in React and Next.js and backend logic in C# (.NET) following Clean Architecture and CQRS patterns.",
+        "Designed and maintained MySQL database schemas and queries supporting core application workflows.",
+        "Debugged cross-team production issues, including Axios interceptor error propagation and React Query cache invalidation bugs, improving application reliability.",
+      ],
       company: "Repoint Solutions",
       logo: "/assets/jpeg/RepointLogo.jpg",
     },
     {
-      period: "2 Months",
-      title: "Pre-Employment Training",
-      description:
-        "Underwent intensive training focused on real-world frontend workflows, developing responsive interfaces, and strengthening software troubleshooting skills.",
-      company: "Repoint Solutions",
-      logo: "/assets/jpeg/RepointLogo.jpg",
-    },
-    {
-      period: "4 Months",
-      title: "Frontend Developer (Internship)",
-      description:
-        "Built and optimized mobile UI components using React Native and Tailwind CSS. Reduced API complexity by implementing TanStack Query and Zod for data validation.",
+      period: "6 Months, 2024",
+      title: "Full Stack Developer — Pre-Employment Training & Internship",
+      bullets: [
+        "Completed an intensive pre-employment training program simulating agile production workflows, building pixel-perfect UIs from Figma mockups.",
+        "Built and maintained modular UI components in React, React Native, Tailwind CSS, and Next.js during a 4-month frontend internship.",
+        "Implemented async state management with TanStack Query and type-safe form validation with Zod.",
+      ],
       company: "Repoint Solutions",
       logo: "/assets/jpeg/RepointLogo.jpg",
     },
@@ -61,71 +60,70 @@ const Experience = ({
           Experience
         </motion.h2>
 
-        <div className="relative pl-6">
-          {/* Vertical timeline line */}
-          <div
-            aria-hidden
-            className="absolute left-0 top-2 bottom-4 w-px bg-border/60"
-          />
-
-          <ul className="space-y-0">
-            {experience.map((exp, index) => (
-              <motion.li
-                key={index}
-                initial={reduce ? false : { opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{
-                  duration: 0.5,
-                  delay: index * 0.1,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="relative pb-10 last:pb-0"
-              >
-                {/* Timeline dot */}
-                <div
-                  aria-hidden
-                  className="absolute -left-[25px] top-1.5 flex h-3 w-3 items-center justify-center rounded-full border border-primary/50 bg-background"
-                >
+        <ul className="space-y-0">
+          {experience.map((exp, index) => (
+            <motion.li
+              key={index}
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="flex gap-4 pb-10 last:pb-0"
+            >
+              {/* Timeline marker */}
+              <div className="flex shrink-0 flex-col items-center">
+                <div className="mt-1.5 flex h-3 w-3 shrink-0 items-center justify-center rounded-full border border-primary/50 bg-background">
                   <div className="h-1 w-1 rounded-full bg-primary/70" />
                 </div>
+              </div>
 
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  {/* Period */}
-                  <div className="shrink-0 md:w-[120px]">
-                    <span className="font-mono text-xs tracking-wide text-muted-foreground">
-                      {exp.period}
-                    </span>
-                  </div>
-
-                  {/* Role + description */}
-                  <div className="flex-1">
-                    <h3 className="mb-2 text-lg font-semibold tracking-tight">
-                      {exp.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {exp.description}
-                    </p>
-                  </div>
-
-                  {/* Company */}
-                  <div className="flex shrink-0 items-center gap-2 md:w-[140px] md:justify-end">
-                    <Image
-                      src={exp.logo}
-                      alt={exp.company}
-                      width={16}
-                      height={16}
-                      className="rounded-sm dark:invert"
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {exp.company}
-                    </span>
-                  </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                {/* Period */}
+                <div className="shrink-0 md:w-[120px]">
+                  <span className="font-mono text-xs tracking-wide text-muted-foreground">
+                    {exp.period}
+                  </span>
                 </div>
-              </motion.li>
-            ))}
-          </ul>
-        </div>
+
+                {/* Role + description */}
+                <div className="flex-1">
+                  <h3 className="mb-2 text-lg font-semibold tracking-tight">
+                    {exp.title}
+                  </h3>
+                  <ul className="space-y-1.5">
+                    {exp.bullets.map((bullet, bulletIndex) => (
+                      <li
+                        key={bulletIndex}
+                        className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"
+                      >
+                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Company */}
+                <div className="flex shrink-0 items-center gap-2 md:w-[140px] md:justify-end">
+                  <Image
+                    src={exp.logo}
+                    alt={exp.company}
+                    width={16}
+                    height={16}
+                    className="rounded-sm dark:invert"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {exp.company}
+                  </span>
+                </div>
+              </div>
+            </motion.li>
+          ))}
+        </ul>
       </div>
     </section>
   )

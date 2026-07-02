@@ -4,6 +4,7 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { Mail } from "lucide-react"
 import { animate, motion, useReducedMotion } from "motion/react"
 import { InteractiveHoverButton } from "../ui/interactive-hover-button"
+import { Meteors } from "../ui/meteors"
 
 function smoothScrollTo(id: string) {
   const target = document.getElementById(id)
@@ -37,6 +38,7 @@ export default function Hero() {
       id="hero"
       className="relative flex min-h-dvh items-center overflow-hidden px-4 pt-20 pb-16"
     >
+      <Meteors number={20} className="-z-10" />
       {/* Ambient glow - upper right */}
       <div
         aria-hidden
