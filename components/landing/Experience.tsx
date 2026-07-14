@@ -20,7 +20,7 @@ interface ExperienceProps {
 const Experience = ({
   experience = [
     {
-      period: "2024 – Present",
+      period: "2025 – Present",
       title: "Full Stack Developer",
       bullets: [
         "Shipped features across four production applications spanning web and mobile: Helps Innovation (React/C#), Careerpoint (Next.js/C#), Neuropoint (React/C#), and Helps Emergency (React Native, published on Google Play).",
@@ -32,7 +32,7 @@ const Experience = ({
       logo: "/assets/jpeg/RepointLogo.jpg",
     },
     {
-      period: "6 Months, 2024",
+      period: "6 Months, 2025",
       title: "Full Stack Developer — Pre-Employment Training & Internship",
       bullets: [
         "Completed an intensive pre-employment training program simulating agile production workflows, building pixel-perfect UIs from Figma mockups.",
