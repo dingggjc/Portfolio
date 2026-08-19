@@ -5,6 +5,7 @@ import { GlobeIcon } from "@radix-ui/react-icons"
 import { motion, useReducedMotion } from "motion/react"
 import Image from "next/image"
 import { BentoCard } from "../ui/bento-grid"
+import { Particles } from "../ui/particles"
 
 const features = projects.map((project) => ({
   id: project.id,
@@ -46,9 +47,17 @@ export function Projects() {
   return (
     <section
       id="projects"
-      className="px-4 py-24 lg:flex lg:min-h-dvh lg:flex-col lg:py-12"
+      className="relative isolate overflow-hidden px-4 py-24 lg:flex lg:min-h-dvh lg:flex-col lg:py-12"
     >
-      <div className="mx-auto flex w-full max-w-4xl flex-col lg:flex-1">
+      <Particles
+        quantity={180}
+        staticity={75}
+        ease={75}
+        size={1.5}
+        color="#c96a38"
+        className="absolute inset-0 z-0 opacity-60 dark:opacity-75"
+      />
+      <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col lg:flex-1">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -44,7 +44,7 @@ const Experience = ({
     <section
       id="experience"
       className={cn(
-        "relative left-1/2 w-screen -translate-x-1/2 isolate overflow-hidden bg-secondary/35 px-4 py-24 sm:py-32",
+        "relative left-1/2 w-screen -translate-x-1/2 isolate overflow-hidden bg-secondary/35 px-4 py-24 sm:py-32 dark:bg-muted/80",
         className
       )}
     >
@@ -75,7 +75,7 @@ const Experience = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.5, ease }}
-            className="border border-border/80 bg-card/70 p-5 shadow-sm backdrop-blur-sm lg:sticky lg:top-24 lg:self-start"
+            className="rounded-xl border border-border/80 bg-card/70 p-5 shadow-sm backdrop-blur-sm lg:sticky lg:top-24 lg:self-start"
           >
             <div className="flex items-center gap-3">
               <Image
@@ -83,7 +83,7 @@ const Experience = ({
                 alt="Repoint Solutions"
                 width={36}
                 height={36}
-                className="rounded-md dark:invert"
+                className="rounded-lg dark:invert"
               />
                 <p className="font-medium tracking-tight">
                   Repoint Solutions Inc.
@@ -135,7 +135,7 @@ const Experience = ({
                   {role.bullets.map((bullet, bulletIndex) => (
                     <li
                       key={bullet}
-                      className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 text-sm leading-relaxed text-muted-foreground"
+                      className="grid grid-cols-[1.5rem_minmax(0,1fr)] items-baseline gap-3 text-sm leading-relaxed text-muted-foreground"
                     >
                       <span
                         aria-hidden
